@@ -110,7 +110,7 @@ export const settingDefs: SettingDef[] = [
     key: "general.timezone",
     group: "general",
     type: "string",
-    default: "Europe/Istanbul",
+    default: "Asia/Shanghai",
     envVar: "TZ",
   },
   {

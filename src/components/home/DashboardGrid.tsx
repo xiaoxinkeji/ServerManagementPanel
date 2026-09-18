@@ -116,7 +116,7 @@ export function DashboardGrid({ layout, widgets }: Props) {
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1 text-xs text-subtle transition-colors hover:text-ink"
+            className="flex items-center gap-1.5 rounded-lg border border-line bg-surface/50 backdrop-blur-xs px-3 py-1.5 text-xs text-subtle transition-all duration-150 hover:bg-surface hover:text-ink hover:shadow-xs"
           >
             <LayoutGrid className="size-3.5" /> {t("home.dashboard.edit")}
           </button>

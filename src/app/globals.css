@@ -4,15 +4,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --canvas: #f6f7f9;
+  --canvas: #f8fafc;
   --surface: #ffffff;
-  --line: #e4e7ec;
-  --ink: #10151f;
-  --subtle: #63708b;
-  --brand: #2563eb;
-  --ok: #15803d;
-  --warn: #b45309;
-  --danger: #b91c1c;
+  --line: #e2e8f0;
+  --ink: #0f172a;
+  --subtle: #64748b;
+  --brand: #3b82f6;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
 
   /*
     Yapışkan üstbarın yüksekliği. Tek kaynak olarak burada duruyor çünkü iki
@@ -24,13 +24,13 @@
 }
 
 .dark {
-  --canvas: #0a0e17;
-  --surface: #121826;
-  --line: #222a3a;
-  --ink: #e6e9ef;
-  --subtle: #94a1ba;
-  --brand: #5b8cff;
-  --ok: #4ade80;
+  --canvas: #090d16;
+  --surface: #111827;
+  --line: #1e293b;
+  --ink: #f1f5f9;
+  --subtle: #94a3b8;
+  --brand: #60a5fa;
+  --ok: #34d399;
   --warn: #fbbf24;
   --danger: #f87171;
 }
@@ -46,9 +46,11 @@
   --color-warn: var(--warn);
   --color-danger: var(--danger);
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, ui-sans-serif, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: ui-monospace, "JetBrains Mono", SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Fira Code", monospace;
 }
 
 @layer base {
@@ -67,6 +69,31 @@
     font-family: var(--font-sans);
     /* Telefon yatay çevrildiğinde tarayıcı yazıyı kendiliğinden büyütmesin. */
     text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* 平滑聚焦效果 */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  /* 优雅滚动条美化 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--subtle);
   }
 
   /*

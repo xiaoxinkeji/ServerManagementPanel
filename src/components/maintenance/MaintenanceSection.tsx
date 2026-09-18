@@ -31,9 +31,9 @@ export async function MaintenanceSection({ canAct }: { canAct: boolean }) {
       <h2 className="font-semibold">{t("maintenance.title")}</h2>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-line bg-surface">
-          <div className="border-b border-line px-5 py-3">
-            <h3 className="font-semibold">{t("maintenance.os.title")}</h3>
+        <section className="rounded-xl border border-line/80 bg-surface/80 shadow-xs transition-shadow hover:shadow-sm overflow-hidden">
+          <div className="border-b border-line px-5 py-3.5 bg-canvas/30">
+            <h3 className="font-semibold text-sm">{t("maintenance.os.title")}</h3>
             <p className="mt-0.5 text-xs text-subtle">
               {os.available && os.reportedAt
                 ? t("maintenance.os.report", { when: ago(os.reportedAt) }) +
@@ -99,9 +99,9 @@ EOF`}
           </div>
         </section>
 
-        <section className="rounded-lg border border-line bg-surface">
-          <div className="border-b border-line px-5 py-3">
-            <h3 className="font-semibold">{t("maintenance.backup.title")}</h3>
+        <section className="rounded-xl border border-line/80 bg-surface/80 shadow-xs transition-shadow hover:shadow-sm overflow-hidden">
+          <div className="border-b border-line px-5 py-3.5 bg-canvas/30">
+            <h3 className="font-semibold text-sm">{t("maintenance.backup.title")}</h3>
             <p className="mt-0.5 text-xs text-subtle">
               {backup.watching ? backup.dir : t("maintenance.backup.off")}
             </p>
@@ -134,11 +134,13 @@ EOF`}
         </section>
       </div>
 
-      <ImageUpdatePanel
-        initial={images?.value ?? []}
-        initialCheckedAt={images?.updatedAt ?? null}
-        canAct={canAct}
-      />
+      <div className="rounded-xl border border-line/80 bg-surface/80 shadow-xs transition-shadow hover:shadow-sm overflow-hidden">
+        <ImageUpdatePanel
+          initial={images?.value ?? []}
+          initialCheckedAt={images?.updatedAt ?? null}
+          canAct={canAct}
+        />
+      </div>
     </div>
   );
 }

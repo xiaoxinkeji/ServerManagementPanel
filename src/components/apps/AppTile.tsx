@@ -176,8 +176,8 @@ export function AppTile({
 
   return (
     <div
-      className={`group relative ${
-        framed ? "overflow-hidden rounded-lg border border-line bg-surface" : ""
+      className={`group relative transition-all duration-150 ${
+        framed ? "overflow-hidden rounded-xl border border-line/80 bg-surface/80 shadow-2xs hover:shadow-xs" : ""
       }`}
     >
       <a
@@ -187,8 +187,8 @@ export function AppTile({
         onClick={(e) => move && e.preventDefault()}
         target={card.openNewTab && !move ? "_blank" : undefined}
         rel="noreferrer"
-        className={`flex items-center gap-3 p-3 transition-colors ${
-          framed ? "hover:bg-canvas" : "rounded-lg border border-line bg-surface hover:border-brand"
+        className={`flex items-center gap-3 p-3.5 transition-all duration-150 ${
+          framed ? "hover:bg-canvas/60" : "rounded-xl border border-line/80 bg-surface/80 shadow-2xs hover:border-brand/60 hover:shadow-xs hover:translate-y-[-1px]"
         } ${card.enabled ? "" : "opacity-50"}`}
       >
         <Logo card={card} />

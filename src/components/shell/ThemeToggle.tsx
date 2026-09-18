@@ -53,7 +53,7 @@ export function ThemeToggle() {
       onClick={toggle}
       title={t("shell.theme.title")}
       aria-label={t("shell.theme.label")}
-      className="flex shrink-0 items-center justify-center rounded-md border border-line p-1.5 text-subtle transition-colors hover:text-ink"
+      className="flex shrink-0 items-center justify-center rounded-lg border border-line/80 bg-surface/60 p-1.5 text-subtle transition-all duration-150 hover:bg-surface hover:text-ink hover:shadow-xs active:scale-95"
     >
       {/*
         İki simge de çiziliyor, biri gizli: hangisinin görüneceğine `.dark`

@@ -154,7 +154,7 @@ export async function publishDiscovery(): Promise<{ announced: number }> {
         // otuz ayrı cihaz görünürdü.
         device: {
           identifiers: [base],
-          name: "Sunucu Paneli", // i18n-ignore — Home Assistant cihaz adı, dil değişince değişmemeli
+          name: "Server Management Panel", // i18n-ignore — Home Assistant 设备名称，保持稳定
           manufacturer: serverT("common.appName"),
         },
       }),

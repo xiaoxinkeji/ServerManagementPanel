@@ -29,7 +29,7 @@ const CHALLENGE_TTL_SECONDS = 300;
 const MAX_CHALLENGE_ATTEMPTS = 5;
 
 function issuer(): string {
-  return "Sunucu Paneli"; // i18n-ignore — doğrulayıcı uygulamadaki sabit kayıt adı
+  return "Server Management Panel"; // i18n-ignore — 认证应用中显示的系统名称
 }
 
 type SecretRow = { totp_secret: string; totp_enabled: number; username: string };

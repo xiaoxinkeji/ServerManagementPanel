@@ -212,7 +212,7 @@ export function AppShell({ children, mode, version, user }: Props) {
           altından geçen içerik başlığın içinden okunurdu. `z-20`, perde
           (z-30), çekmece (z-40) ve komut paletinin (z-50) altında kalıyor.
         */}
-        <header className="sticky top-0 z-20 flex h-[var(--header-h)] shrink-0 items-center gap-2 border-b border-line bg-surface pl-4 pr-[max(1rem,env(safe-area-inset-right))] pt-[env(safe-area-inset-top)] sm:gap-3">
+        <header className="sticky top-0 z-20 flex h-[var(--header-h)] shrink-0 items-center gap-2 border-b border-line bg-surface/90 backdrop-blur-md pl-4 pr-[max(1rem,env(safe-area-inset-right))] pt-[env(safe-area-inset-top)] sm:gap-3 transition-colors">
           <button
             type="button"
             aria-expanded={menuOpen}
@@ -275,7 +275,7 @@ export function AppShell({ children, mode, version, user }: Props) {
                 )
               }
               aria-label={t("shell.search.label")}
-              className="flex items-center justify-center gap-2 rounded-md border border-line px-2 py-1.5 text-subtle transition-colors hover:text-ink"
+              className="flex items-center justify-center gap-2 rounded-lg border border-line/80 bg-surface/60 px-2.5 py-1.5 text-subtle transition-all duration-150 hover:bg-surface hover:text-ink hover:shadow-xs active:scale-95"
             >
               <Search className="size-4" />
               <kbd className="hidden font-mono text-[10px] sm:block">Ctrl K</kbd>
@@ -283,7 +283,7 @@ export function AppShell({ children, mode, version, user }: Props) {
             <Link
               href="/hesap"
               title={t("shell.account.title")}
-              className="hidden rounded-md px-2 py-1 text-right transition-colors hover:bg-line/50 sm:block"
+              className="hidden rounded-lg px-2.5 py-1 text-right transition-all duration-150 hover:bg-line/40 sm:block"
             >
               <div className="text-sm font-medium leading-tight">{user.displayName}</div>
               <div className="text-xs leading-tight text-subtle">{user.roleName}</div>
@@ -294,7 +294,7 @@ export function AppShell({ children, mode, version, user }: Props) {
               disabled={loggingOut}
               title={t("shell.logout")}
               aria-label={t("shell.logout")}
-              className="flex items-center justify-center rounded-md border border-line p-1.5 text-subtle transition-colors hover:text-danger disabled:opacity-50"
+              className="flex items-center justify-center rounded-lg border border-line/80 bg-surface/60 p-1.5 text-subtle transition-all duration-150 hover:border-danger/40 hover:bg-danger/10 hover:text-danger active:scale-95 disabled:opacity-50"
             >
               <LogOut className="size-4" />
             </button>
@@ -328,15 +328,15 @@ function NavLink({
       href={item.href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center gap-2.5 rounded-md px-2 transition-colors ${
+      className={`group flex items-center gap-2.5 rounded-lg px-2.5 transition-all duration-150 ${
         compact ? "py-1 text-[13px]" : "py-1.5 text-sm"
       } ${
         active
-          ? "bg-brand/10 font-medium text-brand"
-          : "text-subtle hover:bg-line/50 hover:text-ink"
+          ? "bg-brand/12 font-medium text-brand shadow-xs"
+          : "text-subtle hover:bg-line/40 hover:text-ink hover:translate-x-0.5"
       }`}
     >
-      <Icon className={`shrink-0 ${compact ? "size-3.5" : "size-4"}`} aria-hidden />
+      <Icon className={`shrink-0 transition-colors ${compact ? "size-3.5" : "size-4"} ${active ? "text-brand" : "text-subtle group-hover:text-ink"}`} aria-hidden />
       <span className="truncate">{tk(item.labelKey)}</span>
       {item.milestone && (
         <span className="ml-auto rounded border border-line px-1 py-px font-mono text-[10px] text-subtle">

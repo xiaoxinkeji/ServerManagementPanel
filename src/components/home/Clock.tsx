@@ -35,7 +35,7 @@ export function Clock({ big = false }: { big?: boolean }) {
   return (
     <div>
       <div
-        className={`font-semibold tabular-nums ${big ? "text-6xl" : "text-3xl"}`}
+        className={`font-semibold tracking-tight tabular-nums bg-gradient-to-r from-ink via-ink to-subtle bg-clip-text text-transparent ${big ? "text-6xl" : "text-3xl"}`}
         // Boşken de aynı yüksekliği kaplasın; yoksa saat gelince sayfa zıplıyor.
         style={{ minHeight: "1em" }}
       >

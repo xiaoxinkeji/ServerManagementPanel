@@ -51,13 +51,15 @@ export function InternetIndicator({
         };
 
   return (
-    <div className={`flex items-center gap-4 rounded-lg border p-5 ${view.ring}`}>
-      <view.Icon className={`shrink-0 ${view.tone} ${big ? "size-14" : "size-9"}`} aria-hidden />
+    <div className={`flex items-center gap-4.5 rounded-xl border p-5 shadow-2xs backdrop-blur-xs transition-all duration-200 ${view.ring}`}>
+      <div className={`flex shrink-0 items-center justify-center rounded-xl p-2.5 ${!status.online ? "bg-danger/10" : broken ? "bg-warn/10" : "bg-ok/10"}`}>
+        <view.Icon className={`${view.tone} ${big ? "size-14" : "size-7"}`} aria-hidden />
+      </div>
       <div className="min-w-0">
-        <div className={`font-semibold ${view.tone} ${big ? "text-3xl" : "text-lg"}`}>
+        <div className={`font-semibold tracking-tight ${view.tone} ${big ? "text-3xl" : "text-base"}`}>
           {view.title}
         </div>
-        <p className={`text-subtle ${big ? "mt-1 text-base" : "text-sm"}`}>{view.detail}</p>
+        <p className={`text-subtle mt-0.5 leading-relaxed ${big ? "mt-1 text-base" : "text-xs"}`}>{view.detail}</p>
       </div>
     </div>
   );

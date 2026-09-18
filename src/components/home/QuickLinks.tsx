@@ -86,7 +86,7 @@ export function QuickLinks({
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("home.quicklinks.search")}
               aria-label={t("home.quicklinks.searchAria")}
-              className="w-full rounded-lg border border-line bg-surface py-2.5 pl-9 pr-3 text-sm outline-none focus:border-brand"
+              className="w-full rounded-xl border border-line/80 bg-surface/80 py-2.5 pl-9 pr-3 text-sm outline-none transition-all duration-150 shadow-2xs focus:border-brand focus:shadow-xs focus:bg-surface"
             />
           </label>
         </form>

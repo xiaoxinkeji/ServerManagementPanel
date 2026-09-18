@@ -30,20 +30,20 @@ export function WeatherCard({
 }) {
   const t = getT();
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3.5 rounded-xl border border-line/60 bg-canvas/40 px-4 py-2.5 shadow-2xs">
       <WeatherIcon
         code={weather.code}
-        className={`shrink-0 text-brand ${big ? "size-12" : "size-8"}`}
+        className={`shrink-0 text-brand ${big ? "size-12" : "size-7"}`}
       />
       <div className="min-w-0">
-        <div className={`font-semibold tabular-nums ${big ? "text-4xl" : "text-2xl"}`}>
+        <div className={`font-semibold tracking-tight tabular-nums ${big ? "text-4xl" : "text-2xl"}`}>
           {Math.round(weather.temperature)}°
         </div>
-        <div className={`text-subtle ${big ? "text-base" : "text-xs"}`}>
+        <div className={`text-subtle font-medium ${big ? "text-base" : "text-xs"}`}>
           {weather.description}
           {label && ` · ${label}`}
         </div>
-        <div className={`text-subtle ${big ? "text-sm" : "text-[11px]"}`}>
+        <div className={`text-subtle/80 ${big ? "text-sm" : "text-[11px]"}`}>
           {/* Hissedilen ayrı yazılıyor: rüzgârlı bir günde 12° ile 6° arasındaki
               fark, dışarı çıkarken giyilecek şeyi değiştiriyor. */}
           {t("home.weather.detail", {

@@ -97,7 +97,7 @@ export default async function OverviewPage() {
    */
   const widgets: Record<string, React.ReactNode> = {
     clock: (
-      <section className="flex h-full flex-wrap items-center justify-between gap-4 rounded-lg border border-line bg-surface p-5">
+      <section className="flex h-full flex-wrap items-center justify-between gap-4 rounded-xl border border-line/80 bg-surface/80 p-5 shadow-xs transition-shadow hover:shadow-sm">
         <Clock />
         {weather.ok && <WeatherCard weather={weather.weather} label={locationLabel} />}
       </section>
@@ -107,10 +107,10 @@ export default async function OverviewPage() {
     apps: <AppSections groups={apps} />,
     maintenance: <MaintenanceSection canAct={hasPermission(session.user, "docker.action")} />,
     system: (
-      <section className="rounded-lg border border-line bg-surface p-5">
+      <section className="rounded-xl border border-line/80 bg-surface/80 p-5 shadow-xs transition-shadow hover:shadow-sm">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold">{t("overview.system")}</h2>
-          <span className="text-xs text-subtle">
+          <h2 className="font-semibold tracking-tight">{t("overview.system")}</h2>
+          <span className="text-xs text-subtle font-mono">
             {isMockMode()
               ? t("overview.mock")
               : t("overview.live")}
@@ -119,9 +119,9 @@ export default async function OverviewPage() {
 
         <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
           {facts.map((fact) => (
-            <div key={fact.label} className="min-w-0">
+            <div key={fact.label} className="min-w-0 rounded-lg p-2 transition-colors hover:bg-canvas/60">
               <dt className="text-xs text-subtle">{fact.label}</dt>
-              <dd className="truncate text-sm font-medium" title={fact.value}>
+              <dd className="truncate text-sm font-medium mt-0.5" title={fact.value}>
                 {fact.value}
               </dd>
             </div>
