@@ -228,6 +228,20 @@ Measures taken to limit this risk:
 
 ## Installation
 
+### Quick Install (Prebuilt Image, Recommended)
+
+For users who want to run the panel without cloning the repository or building from source:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/xiaoxinkeji/ServerManagementPanel/main/install.sh | bash
+```
+
+Or deploy using `docker-compose.yml` pulling `ghcr.io/xiaoxinkeji/servermanagementpanel:latest`.
+
+---
+
+### Build and Run from Source (For Developers)
+
 All the steps below are run **on the server**, in the directory where the panel will be installed.
 
 ### 1. Clone the repository

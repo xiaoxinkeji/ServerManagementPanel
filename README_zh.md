@@ -132,81 +132,137 @@ CPU、内存、磁盘与网络历史趋势，支持自选时间范围。
 
 ## 安装部署
 
-以下所有步骤均在准备运行该面板的**服务器终端**上执行。
+以下提供两种部署方式：对于绝大多数普通用户，推荐**方式一（极速免编译安装）**；若需要二次开发或调整源代码，可选择**方式二（源码编译安装）**。
 
-### 1. 克隆代码仓库
+---
 
+### 方式一：极速免编译安装（推荐，专为普通用户设计）
+
+普通用户无需安装 Node.js 或克隆全量源代码，只需准备两个配置文件（`docker-compose.yml` 和 `Caddyfile`）即可一键拉取已经预构建好的多架构容器镜像运行：
+
+#### 选项 A：一键安装脚本（最快）
+
+在服务器终端执行：
 ```bash
-git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
-cd ServerManagementPanel
+curl -sSL https://raw.githubusercontent.com/xiaoxinkeji/ServerManagementPanel/main/install.sh | bash
 ```
 
-### 2. 配置 `.env` 环境变量
+#### 选项 B：手动快速部署
 
+1. 创建并进入专属部署目录：
 ```bash
-cp .env.example .env
+mkdir -p /opt/server-panel && cd /opt/server-panel
 ```
 
-生成并填写以下两项**必须项**：
+2. 下载预置配置文件：
+```bash
+curl -fsSL https://raw.githubusercontent.com/xiaoxinkeji/ServerManagementPanel/main/Caddyfile -o Caddyfile
+```
 
+3. 创建 `docker-compose.yml`：
+```yaml
+services:
+  panel:
+    image: ghcr.io/xiaoxinkeji/servermanagementpanel:latest
+    restart: unless-stopped
+    group_add:
+      - "${DOCKER_GID}"
+    environment:
+      MOCK_MODE: ${MOCK_MODE:-0}
+      APP_VERSION: ${APP_VERSION:-1.9.0}
+      TZ: ${TZ:-Asia/Shanghai}
+      MASTER_KEY: ${MASTER_KEY}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      HELPER_SECRET: ${HELPER_SECRET:-}
+      PANEL_HTTPS_PORT: ${PANEL_HTTPS_PORT:-8443}
+      PANEL_HTTP_PORT: ${PANEL_HTTP_PORT:-8080}
+    volumes:
+      - panel-data:/app/data
+      - proxy-config:/app/proxy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /run/panel-helper:/run/panel-helper
+      # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro,rslave
+      - ${PANEL_REPORTS_DIR:-./reports}:/app/reports:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /etc/hostname:/host/etc/hostname:ro
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - panel
+    ports:
+      - "${PANEL_HTTP_PORT:-8080}:80"
+      - "${PANEL_HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - proxy-config:/etc/caddy/proxy:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      PANEL_SITE_ADDRESSES: ${PANEL_SITE_ADDRESSES:-:80}
+
+volumes:
+  panel-data:
+  caddy-data:
+  caddy-config:
+  proxy-config:
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${PANEL_SUBNET:-172.28.0.0/16}
+```
+
+4. 创建 `.env` 环境变量文件：
 ```bash
 # 生成 32 字节（64 位十六进制）加密私钥
-openssl rand -hex 32
-
+MASTER_KEY=$(openssl rand -hex 32)
 # 获取宿主机 docker 用户组的 GID
-getent group docker | cut -d: -f3
+DOCKER_GID=$(getent group docker | cut -d: -f3)
+
+cat << EOF > .env
+MASTER_KEY=${MASTER_KEY}
+DOCKER_GID=${DOCKER_GID}
+PANEL_HTTP_PORT=8080
+PANEL_HTTPS_PORT=8443
+TZ=Asia/Shanghai
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=
+EOF
 ```
 
-将上面的输出填入 `.env` 文件中：
-```ini
-MASTER_KEY=在此粘贴上面生成的64位随机十六进制密钥
-DOCKER_GID=在此粘贴上面获取到的docker组GID数字
-```
-
-确认服务器端口未被占用（面板默认为 `8080`，SSL 站点反向代理默认为 `8443`）：
+5. 启动服务：
 ```bash
-ss -lntp | grep -E ':(8080|8443) '
+docker compose up -d
 ```
-若有冲突可在 `.env` 中修改 `PANEL_HTTP_PORT` 和 `PANEL_HTTPS_PORT`。
+打开浏览器访问 `http://<服务器IP>:8080`，首次管理员密码输出在日志中：`docker compose logs panel`。
 
-### 3. 未安装 Tailscale 时的处理
+---
 
-若服务器未安装 Tailscale，请在 `docker-compose.yml` 中注释掉 Tailscale 套接字挂载，否则 Compose 启动时会因文件不存在而报错：
+### 方式二：克隆源码编译运行（适合二次开发）
 
-```yaml
-      # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
-```
+若需要自定义前端页面、修改代码逻辑或自行构建镜像：
 
-### 4. 启动服务
-
-可以选择以下任意一种方式启动：
-
-- **方式 A（本地直接构建，最推荐）：**
-  ```bash
-  docker compose up -d --build
-  ```
-  该命令会基于克隆的代码直接在本地完成镜像编译并启动，确保所有汉化与修改即时生效。ARM64 / x86 服务器均会自动适配。
-
-- **方式 B（使用 GitHub 预构建镜像）：**
-  若你的服务器配置较低不想在本地编译，可修改 `docker-compose.yml` 中 `panel` 服务，直接拉取你仓库 GitHub Actions 构建发布的镜像：
-  ```yaml
-    panel:
-      image: ghcr.io/xiaoxinkeji/servermanagementpanel:latest
-      # 将原有的 build 节点注释或移除
-  ```
-  然后直接启动：
-  ```bash
-  docker compose up -d
-  ```
-
-首次启动时，数据库会自动初始化并创建 `admin` 超级管理员账号。如果 `.env` 中留空了 `ADMIN_PASSWORD`，初始随机密码会打印在容器日志中：
 ```bash
-docker compose logs panel
+# 1. 克隆代码仓库
+git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
+cd ServerManagementPanel
+
+# 2. 准备环境变量文件并配置 MASTER_KEY 与 DOCKER_GID
+cp .env.example .env
+
+# 3. 本地编译并启动
+docker compose up -d --build
 ```
-
-### 5. 登录与使用
-
-打开浏览器访问 `http://<服务器IP>:8080`，使用 `admin` 账号登录。首次登录将引导修改密码。
 
 ---
 
