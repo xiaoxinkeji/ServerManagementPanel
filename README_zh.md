@@ -132,12 +132,50 @@ CPU、内存、磁盘与网络历史趋势，支持自选时间范围。
 
 ## 安装部署
 
-推荐通过 `docker-compose.yml` 部署：
+### 方式一：克隆仓库直接运行（推荐）
+
+直接使用本仓库自带的完整 `docker-compose.yml`（包含主面板及反向代理网关 Caddy），在本地构建并启动：
+
+```bash
+# 1. 克隆汉化后的代码仓库
+git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
+cd ServerManagementPanel
+
+# 2. 准备环境变量配置文件
+cp .env.example .env
+
+# 3. 生成必要配置（64位密钥和 Docker 用户组 GID）
+openssl rand -hex 32
+getent group docker | cut -d: -f3
+```
+
+将上面两行命令的输出填入 `.env` 文件中的 `MASTER_KEY` 与 `DOCKER_GID`：
+```ini
+MASTER_KEY=填入上面生成的32字节hex随机密钥
+DOCKER_GID=填入上面获取到的docker组id
+```
+
+> **注意：** 若服务器未安装 Tailscale，请在 `docker-compose.yml` 中注释掉 tailscaled.sock 挂载行：
+> ```yaml
+> # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
+> ```
+
+启动服务：
+```bash
+docker compose up -d --build
+```
+打开浏览器访问 `http://<你的服务器IP>:8080` 即可开始使用，初次访问将引导创建超级管理员账号。
+
+---
+
+### 方式二：使用 GitHub Packages 预构建镜像
+
+你的仓库 GitHub Actions 会自动构建并发布容器镜像至 GitHub Container Registry：
 
 ```yaml
 services:
   panel:
-    image: ghcr.io/coraspirin/server-management-panel:latest
+    image: ghcr.io/xiaoxinkeji/servermanagementpanel:latest
     container_name: server-panel
     restart: unless-stopped
     ports:
@@ -147,20 +185,11 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /:/host:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/host/root:ro,rslave
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
 ```
-
-> **提示：** 生成 `MASTER_KEY`：
-> ```bash
-> openssl rand -hex 32
-> ```
-
-启动服务：
-```bash
-docker compose up -d
-```
-打开浏览器访问 `http://<你的服务器IP>:3000` 即可开始使用。初次访问将引导创建超级管理员账号。
 
 ---
 
@@ -185,7 +214,7 @@ docker compose up -d
 
 ```bash
 # 1. 克隆代码仓库
-git clone https://github.com/coraspirin/ServerManagementPanel.git
+git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
 cd ServerManagementPanel
 
 # 2. 安装依赖
