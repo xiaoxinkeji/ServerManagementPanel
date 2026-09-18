@@ -233,7 +233,7 @@ All the steps below are run **on the server**, in the directory where the panel 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/coraspirin/ServerManagementPanel.git
+git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
 cd ServerManagementPanel
 ```
 

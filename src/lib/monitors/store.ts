@@ -123,6 +123,10 @@ export function validateMonitor(input: MonitorInput): string | null {
     return serverT("monitorStore.tcpFormat");
   }
 
+  if ((input.type === "ping" || input.type === "dns") && (input.target.trim().startsWith("-") || /\s/.test(input.target.trim()))) {
+    return serverT("monitorStore.invalidUrl");
+  }
+
   for (const [label, value, min, max] of [
     [serverT("monitorStore.interval"), input.intervalSeconds, 10, 3600],
     [serverT("monitorForm.timeout"), input.timeoutSeconds, 1, 120],

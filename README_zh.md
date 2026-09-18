@@ -132,63 +132,115 @@ CPU、内存、磁盘与网络历史趋势，支持自选时间范围。
 
 ## 安装部署
 
-### 方式一：克隆仓库直接运行（推荐）
+以下所有步骤均在准备运行该面板的**服务器终端**上执行。
 
-直接使用本仓库自带的完整 `docker-compose.yml`（包含主面板及反向代理网关 Caddy），在本地构建并启动：
+### 1. 克隆代码仓库
 
 ```bash
-# 1. 克隆汉化后的代码仓库
 git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
 cd ServerManagementPanel
+```
 
-# 2. 准备环境变量配置文件
+### 2. 配置 `.env` 环境变量
+
+```bash
 cp .env.example .env
+```
 
-# 3. 生成必要配置（64位密钥和 Docker 用户组 GID）
+生成并填写以下两项**必须项**：
+
+```bash
+# 生成 32 字节（64 位十六进制）加密私钥
 openssl rand -hex 32
+
+# 获取宿主机 docker 用户组的 GID
 getent group docker | cut -d: -f3
 ```
 
-将上面两行命令的输出填入 `.env` 文件中的 `MASTER_KEY` 与 `DOCKER_GID`：
+将上面的输出填入 `.env` 文件中：
 ```ini
-MASTER_KEY=填入上面生成的32字节hex随机密钥
-DOCKER_GID=填入上面获取到的docker组id
+MASTER_KEY=在此粘贴上面生成的64位随机十六进制密钥
+DOCKER_GID=在此粘贴上面获取到的docker组GID数字
 ```
 
-> **注意：** 若服务器未安装 Tailscale，请在 `docker-compose.yml` 中注释掉 tailscaled.sock 挂载行：
-> ```yaml
-> # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
-> ```
-
-启动服务：
+确认服务器端口未被占用（面板默认为 `8080`，SSL 站点反向代理默认为 `8443`）：
 ```bash
-docker compose up -d --build
+ss -lntp | grep -E ':(8080|8443) '
 ```
-打开浏览器访问 `http://<你的服务器IP>:8080` 即可开始使用，初次访问将引导创建超级管理员账号。
+若有冲突可在 `.env` 中修改 `PANEL_HTTP_PORT` 和 `PANEL_HTTPS_PORT`。
+
+### 3. 未安装 Tailscale 时的处理
+
+若服务器未安装 Tailscale，请在 `docker-compose.yml` 中注释掉 Tailscale 套接字挂载，否则 Compose 启动时会因文件不存在而报错：
+
+```yaml
+      # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
+```
+
+### 4. 启动服务
+
+可以选择以下任意一种方式启动：
+
+- **方式 A（本地直接构建，最推荐）：**
+  ```bash
+  docker compose up -d --build
+  ```
+  该命令会基于克隆的代码直接在本地完成镜像编译并启动，确保所有汉化与修改即时生效。ARM64 / x86 服务器均会自动适配。
+
+- **方式 B（使用 GitHub 预构建镜像）：**
+  若你的服务器配置较低不想在本地编译，可修改 `docker-compose.yml` 中 `panel` 服务，直接拉取你仓库 GitHub Actions 构建发布的镜像：
+  ```yaml
+    panel:
+      image: ghcr.io/xiaoxinkeji/servermanagementpanel:latest
+      # 将原有的 build 节点注释或移除
+  ```
+  然后直接启动：
+  ```bash
+  docker compose up -d
+  ```
+
+首次启动时，数据库会自动初始化并创建 `admin` 超级管理员账号。如果 `.env` 中留空了 `ADMIN_PASSWORD`，初始随机密码会打印在容器日志中：
+```bash
+docker compose logs panel
+```
+
+### 5. 登录与使用
+
+打开浏览器访问 `http://<服务器IP>:8080`，使用 `admin` 账号登录。首次登录将引导修改密码。
 
 ---
 
-### 方式二：使用 GitHub Packages 预构建镜像
+## 可选组件（提升管理能力）
 
-你的仓库 GitHub Actions 会自动构建并发布容器镜像至 GitHub Container Registry：
+### host-helper（宿主机助手）
 
-```yaml
-services:
-  panel:
-    image: ghcr.io/xiaoxinkeji/servermanagementpanel:latest
-    container_name: server-panel
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - MASTER_KEY=在此填入64位随机十六进制密钥
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /:/host/root:ro,rslave
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
+用于支持 Compose 堆栈管理、systemd 服务管理、服务器开关机与重启、ufw 防火墙、宿主机 crontab 管理及服务器终端执行。
+
+```bash
+sudo host-helper/install.sh
+```
+该脚本会将后台辅助服务安装为 systemd 服务，并输出 `HELPER_SECRET`。将该值添加到 `.env` 文件中的 `HELPER_SECRET=` 后，执行 `docker compose up -d` 即可。可通过编辑 `/etc/panel-helper/allow.conf` 按需开启具体命令权限。
+
+### 硬件健康检测报告（S.M.A.R.T / ZFS / 温度）
+
+```bash
+sudo apt install smartmontools
+sudo install -m 700 scripts/hardware.sh /usr/local/bin/panel-hardware.sh
+mkdir -p reports
+sudo tee /etc/cron.d/panel-hardware <<EOF
+*/30 * * * * root PANEL_REPORTS_DIR=$PWD/reports /usr/local/bin/panel-hardware.sh
+EOF
+```
+
+### 系统可更新软件包检测报告
+
+仅用于巡检与汇报系统安全更新与补丁，**不会**自动安装软件包：
+
+```bash
+sudo install -m 700 scripts/os-updates.sh /usr/local/bin/panel-os-updates.sh
+sudo tee /etc/cron.d/panel-os-updates <<EOF
+17 6 * * * root PANEL_REPORTS_DIR=$PWD/reports /usr/local/bin/panel-os-updates.sh
+EOF
 ```
 
 ---

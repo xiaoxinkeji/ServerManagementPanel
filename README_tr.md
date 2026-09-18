@@ -149,7 +149,7 @@ Aşağıdaki adımların hepsi **sunucuda**, panelin kurulacağı dizinde çalı
 ### 1. Depoyu klonla
 
 ```bash
-git clone https://github.com/coraspirin/ServerManagementPanel.git
+git clone https://github.com/xiaoxinkeji/ServerManagementPanel.git
 cd ServerManagementPanel
 ```
 
