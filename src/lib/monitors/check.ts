@@ -201,10 +201,10 @@ function pingCheck(monitor: Monitor, timeoutMs: number): Promise<CheckResult> {
   const seconds = Math.max(1, Math.round(timeoutMs / 1000));
 
   return new Promise<CheckResult>((resolve) => {
-    // -n: DNS ters çözümleme yapma (yavaşlatır), -c 1: tek paket, -W: yanıt süresi
+    // -n: DNS ters çözümleme yapma (yavaşlatır), -c 1: tek paket, -W: yanıt süresi, --: bayrak enjeksiyonu engelleme
     execFile(
       "ping",
-      ["-n", "-c", "1", "-W", String(seconds), monitor.target.trim()],
+      ["-n", "-c", "1", "-W", String(seconds), "--", monitor.target.trim()],
       { timeout: timeoutMs + 2000 },
       (error, stdout) => {
         if (!error) {
