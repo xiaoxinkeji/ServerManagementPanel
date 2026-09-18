@@ -94,7 +94,7 @@ services:
       # katılma/ayrılma gibi işlemler bilerek dışarıda (T4 — yerleri
       # host-helper'ın izin listesi). Tailscale kurulu değilse bu satır
       # yorumlanmalı, yoksa compose ayağa kalkmaz.
-      - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
+      # - /var/run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock:ro
 
       # Host sistem metrikleri (M1.1) — container'ın kendi /proc'u değil,
       # host'unki okunmalı. Özellikle /proc/net/dev ağ namespace'ine tabidir:
