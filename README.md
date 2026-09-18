@@ -1,5 +1,7 @@
 # Server Management Panel
 
+[English](README.md) · [Türkçe](README_tr.md) · [简体中文](README_zh.md)
+
 A self-hosted management panel written for a single Linux + Docker server. It brings monitoring, alerting, Docker and compose management, quick access to services, backups, firewall, file and database management together in one interface.
 
 Designed at home-server (homelab) scale: a single container, embedded SQLite, no external database or queue. The interface and all text are in Turkish.

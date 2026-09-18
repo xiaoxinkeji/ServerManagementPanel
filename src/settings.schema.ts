@@ -97,7 +97,7 @@ export const settingDefs: SettingDef[] = [
     key: "general.language",
     group: "general",
     type: "locale",
-    default: "tr",
+    default: "zh",
   },
   {
     key: "general.theme",

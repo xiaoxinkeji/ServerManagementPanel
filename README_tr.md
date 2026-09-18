@@ -1,5 +1,7 @@
 # Sunucu Yönetim Paneli
 
+[English](README.md) · [Türkçe](README_tr.md) · [简体中文](README_zh.md)
+
 Tek bir Linux + Docker sunucusu için yazılmış, kendi sunucunda barındırdığın bir yönetim paneli. İzleme, alarm, Docker ve compose yönetimi, servislere hızlı erişim, yedekleme, güvenlik duvarı, dosya ve veritabanı yönetimini tek arayüzde toplar.
 
 Ev sunucusu (homelab) ölçeği düşünülerek tasarlandı: tek container, gömülü SQLite, harici veritabanı ya da kuyruk yok. Arayüz ve tüm metinler Türkçedir.
