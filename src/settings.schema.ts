@@ -397,6 +397,35 @@ export const settingDefs: SettingDef[] = [
     min: 50,
     max: 10000,
   },
+  // ---------- LLM 深度大语言模型 (System 2 专家层) ----------
+  {
+    key: "ai.llm.enabled",
+    group: "docker",
+    section: "llmAi",
+    type: "bool",
+    default: false,
+  },
+  {
+    key: "ai.llm.endpoint",
+    group: "docker",
+    section: "llmAi",
+    type: "string",
+    default: "https://api.deepseek.com/v1",
+  },
+  {
+    key: "ai.llm.api_key",
+    group: "docker",
+    section: "llmAi",
+    type: "secret",
+    default: "",
+  },
+  {
+    key: "ai.llm.model",
+    group: "docker",
+    section: "llmAi",
+    type: "string",
+    default: "deepseek-chat",
+  },
   // ---------- 外部 Webhook 触发部署 (CI/CD Deploy) ----------
   {
     key: "docker.webhook_deploy.enabled",

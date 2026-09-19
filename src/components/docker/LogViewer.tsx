@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Minus, Pause, Play, Plus, Search, Trash2, Sparkles, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Download, Minus, Pause, Play, Plus, Search, Trash2, Sparkles, CheckCircle2, AlertTriangle, XCircle, Bot, Copy, Check } from "lucide-react";
 
 import { parseAnsi, stripAnsi, type AnsiSpan } from "@/lib/logs/ansi";
 import { fold } from "@/lib/text";
@@ -113,6 +113,16 @@ export function LogViewer({
   const [connected, setConnected] = useState(false);
   const [font, setFont] = useState(11);
   const [diagnosing, setDiagnosing] = useState(false);
+  const [deepDiagnosing, setDeepDiagnosing] = useState(false);
+  const [copiedCmd, setCopiedCmd] = useState<number | null>(null);
+  const [prescription, setPrescription] = useState<{
+    rootCause: string;
+    commands: string[];
+    explanation: string;
+    prevention: string;
+    model: string;
+    latency_ms: number;
+  } | null>(null);
   const [diagnosis, setDiagnosis] = useState<{
     category: string;
     category_label: string;
@@ -223,6 +233,7 @@ export function LogViewer({
 
   async function runDiagnosis() {
     setDiagnosing(true);
+    setPrescription(null);
     try {
       const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
       const csrf = match ? decodeURIComponent(match[1]) : "";
@@ -243,6 +254,44 @@ export function LogViewer({
       setDiagnosing(false);
     }
   }
+
+  async function runDeepDiagnose() {
+    setDeepDiagnosing(true);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const rawLogs = lines.slice(-40).map((l) => l.text).join("\n");
+      const res = await fetch("/api/ai/deep-diagnose", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: csrf,
+        },
+        body: JSON.stringify({
+          containerId,
+          containerName,
+          logs: rawLogs,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPrescription(data.prescription);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Deep diagnosis failed");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setDeepDiagnosing(false);
+    }
+  }
+
+  const copyCommand = (cmd: string, idx: number) => {
+    void navigator.clipboard.writeText(cmd);
+    setCopiedCmd(idx);
+    setTimeout(() => setCopiedCmd(null), 2000);
+  };
 
   function download() {
     const text = filtered
@@ -346,50 +395,110 @@ export function LogViewer({
       )}
 
       {diagnosis && (
-        <div className="rounded-lg border border-brand/30 bg-brand/5 p-3 text-xs">
-          <div className="flex items-center justify-between gap-2 border-b border-brand/20 pb-2">
-            <div className="flex items-center gap-1.5 font-semibold text-brand">
-              <Sparkles className="size-4" />
+        <div className="rounded-xl border border-brand/30 bg-brand/5 p-4 text-xs space-y-3 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-brand/20 pb-2.5">
+            <div className="flex items-center gap-2 font-semibold text-brand text-sm">
+              <Sparkles className="size-4 animate-pulse" />
               <span>{t("docker.diagnose.title")}</span>
             </div>
-            <div className="flex items-center gap-2 text-subtle">
-              <span>{t("docker.diagnose.source")}: {diagnosis.source === "builtin_jev" ? t("docker.diagnose.engineBuiltin") : diagnosis.source === "remote_jev" ? t("docker.diagnose.engineRemote") : t("docker.diagnose.engineRules")}</span>
+        <div className="rounded-xl border border-brand/30 bg-brand/5 p-4 text-xs space-y-3 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-brand/20 pb-2.5">
+            <div className="flex items-center gap-2 font-semibold text-brand text-sm">
+              <Sparkles className="size-4 animate-pulse" />
+              <span>{t("docker.diagnose.title")}</span>
+            </div>
+            <div className="flex items-center gap-2 text-subtle text-[11px] font-mono">
+              <span>{t("docker.diagnose.source")}: {diagnosis.source.includes("jev") ? "Jev System One" : "Heuristic Rules"}</span>
               <span>·</span>
               <span>{t("docker.diagnose.latency")}: {diagnosis.latency_ms}ms</span>
             </div>
           </div>
-          <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 font-medium">
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 font-medium">
                 {diagnosis.is_fatal ? (
-                  <XCircle className="size-4 text-danger" />
-                ) : diagnosis.category === "normal_operation" ? (
-                  <CheckCircle2 className="size-4 text-ok" />
+                  <XCircle className="size-4 text-danger shrink-0" />
+                ) : diagnosis.category_label.includes("健康") || diagnosis.category === "normal_operation" ? (
+                  <CheckCircle2 className="size-4 text-ok shrink-0" />
                 ) : (
-                  <AlertTriangle className="size-4 text-warn" />
+                  <AlertTriangle className="size-4 text-warn shrink-0" />
                 )}
-                <span className="text-ink">{diagnosis.category_label}</span>
-                <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand">
+                <span className="text-ink font-semibold">{diagnosis.category_label}</span>
+                <span className="rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand">
                   {t("docker.diagnose.confidence")}: {Math.round(diagnosis.confidence * 100)}%
                 </span>
               </div>
               <p className="text-subtle leading-relaxed">{diagnosis.summary}</p>
-              {diagnosis.evidence && diagnosis.evidence.length > 0 && (
-                <div className="mt-1">
-                  <span className="font-medium text-ink">{t("docker.diagnose.evidence")}:</span>
-                  <ul className="mt-0.5 space-y-0.5 font-mono text-[10px] text-subtle">
-                    {diagnosis.evidence.map((line, i) => (
-                      <li key={i} className="truncate">{line}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
-            <div className="space-y-1 rounded bg-surface/50 p-2">
-              <span className="font-medium text-ink">{t("docker.diagnose.recommendation")}:</span>
+
+            <div className="space-y-1.5 rounded-lg bg-surface/70 border border-brand/10 p-3">
+              <span className="font-semibold text-ink">{t("docker.diagnose.recommendation")}:</span>
               <p className="text-subtle leading-relaxed">{diagnosis.recommendation}</p>
             </div>
           </div>
+
+          {/* 第二级：大语言模型专家处方按钮 */}
+          <div className="pt-1 flex flex-wrap items-center justify-between gap-2 border-t border-brand/10">
+            <span className="text-[11px] text-subtle">需要针对此容器的具体操作步骤和排查命令？</span>
+            <button
+              type="button"
+              disabled={deepDiagnosing}
+              onClick={() => void runDeepDiagnose()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand/40 bg-surface px-3 py-1.5 text-xs font-semibold text-brand shadow-2xs transition-all hover:bg-brand/10 active:scale-95 disabled:opacity-50"
+            >
+              <Bot className="size-3.5" />
+              <span>{deepDiagnosing ? t("docker.diagnose.deepGenerating") : t("docker.diagnose.deepBtn")}</span>
+            </button>
+          </div>
+
+          {/* 专家处方卡片 */}
+          {prescription && (
+            <div className="mt-3 rounded-xl border border-brand/40 bg-surface/90 p-4 space-y-3 text-ink animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-line/60 pb-2">
+                <div className="flex items-center gap-2 font-semibold text-brand">
+                  <Bot className="size-4 text-brand" />
+                  <span>{t("docker.diagnose.deepTitle")}</span>
+                </div>
+                <span className="text-[11px] font-mono text-subtle">
+                  模型: {prescription.model} · {prescription.latency_ms}ms
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-xs font-semibold text-subtle uppercase tracking-wider">根本原因分析 (Root Cause)</span>
+                <p className="text-xs text-ink leading-relaxed">{prescription.rootCause}</p>
+              </div>
+
+              {prescription.commands && prescription.commands.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold text-subtle uppercase tracking-wider">建议排查与修复指令</span>
+                  <div className="space-y-2">
+                    {prescription.commands.map((cmd, idx) => (
+                      <div key={idx} className="relative rounded-lg border border-line bg-canvas/90 p-2.5 font-mono text-xs">
+                        <pre className="overflow-x-auto whitespace-pre-wrap pr-8 text-ink">{cmd}</pre>
+                        <button
+                          type="button"
+                          onClick={() => copyCommand(cmd, idx)}
+                          className="absolute right-2 top-2 rounded p-1 text-subtle hover:bg-surface hover:text-ink transition-colors"
+                          title={t("docker.diagnose.copyCmd")}
+                        >
+                          {copiedCmd === idx ? <Check className="size-3.5 text-ok" /> : <Copy className="size-3.5" />}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {prescription.explanation && (
+                <div className="space-y-1 rounded bg-canvas/40 p-2.5 text-xs text-subtle leading-relaxed">
+                  <span className="font-medium text-ink">深度机理说明：</span>
+                  {prescription.explanation}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
