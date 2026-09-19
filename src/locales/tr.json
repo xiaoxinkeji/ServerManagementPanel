@@ -3790,5 +3790,21 @@
   "settings.items.docker.webhook_deploy.enabled.label": "Webhook Dağıtımını Etkinleştir",
   "settings.items.docker.webhook_deploy.enabled.help": "Harici CI/CD iş akışlarının /api/v1/webhooks/deploy üzerinden konteyner güncellemesini sağlar.",
   "settings.items.docker.webhook_deploy.token.label": "Dağıtım Gizli Belirteci",
-  "settings.items.docker.webhook_deploy.token.help": "X-Deploy-Token başlığında beklenen kimlik doğrulama belirteci."
+  "settings.items.docker.webhook_deploy.token.help": "X-Deploy-Token başlığında beklenen kimlik doğrulama belirteci.",
+  "settings.sections.jevAi": "Jev System One Karar Modeli ve Akıllı Teşhis",
+  "settings.items.ai.jev.enabled.label": "Jev AI Teşhis Motorunu Etkinleştir",
+  "settings.items.ai.jev.enabled.help": "Etkinleştirildiğinde, konteyner günlük anomalilerini ve durumunu Jev System One karar modelleriyle milisaniyeler içinde teşhis eder.",
+  "settings.items.ai.jev.endpoint.label": "Jev API Uç Noktası",
+  "settings.items.ai.jev.endpoint.help": "TypeSafe Jev veya uyumlu uç nokta (OpenRouter, Cloudflare AI Gateway veya yerel LitJev/NanoJev).",
+  "settings.items.ai.jev.api_key.label": "Jev API Anahtarı",
+  "settings.items.ai.jev.api_key.help": "Jev karar servisine erişim için kimlik doğrulama belirteci.",
+  "settings.items.ai.jev.model.label": "Model Kimliği",
+  "settings.items.ai.jev.model.help": "Varsayılan jev-1 veya uyumlu model.",
+  "docker.diagnose.button": "Jev Akıllı Teşhis",
+  "docker.diagnose.running": "Teşhis ediliyor...",
+  "docker.diagnose.title": "Jev Konteyner Durumu ve Günlük Teşhis Raporu",
+  "docker.diagnose.confidence": "Güven Oranı",
+  "docker.diagnose.recommendation": "Çözüm Önerisi",
+  "docker.diagnose.source": "Motor Kaynağı",
+  "docker.diagnose.latency": "Gecikme"
 }

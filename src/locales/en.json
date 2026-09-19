@@ -3790,5 +3790,21 @@
   "settings.items.docker.webhook_deploy.enabled.label": "Enable Webhook Deploy Trigger",
   "settings.items.docker.webhook_deploy.enabled.help": "Allows external CI/CD workflows to trigger container updates via /api/v1/webhooks/deploy.",
   "settings.items.docker.webhook_deploy.token.label": "Deploy Secret Token",
-  "settings.items.docker.webhook_deploy.token.help": "Secret token expected in the X-Deploy-Token request header for authentication."
+  "settings.items.docker.webhook_deploy.token.help": "Secret token expected in the X-Deploy-Token request header for authentication.",
+  "settings.sections.jevAi": "Jev System One Decision Engine & AI Diagnosis",
+  "settings.items.ai.jev.enabled.label": "Enable Jev AI Diagnosis Engine",
+  "settings.items.ai.jev.enabled.help": "When enabled, utilizes Jev System One decision models for millisecond typed diagnosis of container log anomalies.",
+  "settings.items.ai.jev.endpoint.label": "Jev API Endpoint",
+  "settings.items.ai.jev.endpoint.help": "TypeSafe Jev or compatible endpoint (supports OpenRouter, Cloudflare AI Gateway, or local LitJev/NanoJev).",
+  "settings.items.ai.jev.api_key.label": "Jev API Key",
+  "settings.items.ai.jev.api_key.help": "API Bearer token used to authenticate with Jev decision service.",
+  "settings.items.ai.jev.model.label": "Model Identifier",
+  "settings.items.ai.jev.model.help": "Default is jev-1, or specify compatible model.",
+  "docker.diagnose.button": "Jev AI Diagnose",
+  "docker.diagnose.running": "Diagnosing...",
+  "docker.diagnose.title": "Jev Container State & Log Diagnosis Report",
+  "docker.diagnose.confidence": "Confidence",
+  "docker.diagnose.recommendation": "Recommendation",
+  "docker.diagnose.source": "Engine Source",
+  "docker.diagnose.latency": "Latency"
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Minus, Pause, Play, Plus, Search, Trash2 } from "lucide-react";
+import { Download, Minus, Pause, Play, Plus, Search, Trash2, Sparkles, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 
 import { parseAnsi, stripAnsi, type AnsiSpan } from "@/lib/logs/ansi";
 import { fold } from "@/lib/text";
@@ -112,6 +112,17 @@ export function LogViewer({
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const [font, setFont] = useState(11);
+  const [diagnosing, setDiagnosing] = useState(false);
+  const [diagnosis, setDiagnosis] = useState<{
+    category_label: string;
+    is_fatal: boolean;
+    can_autoheal: boolean;
+    confidence: number;
+    summary: string;
+    recommendation: string;
+    source: string;
+    latency_ms: number;
+  } | null>(null);
 
   const boxRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
@@ -208,6 +219,29 @@ export function LogViewer({
     }
   }
 
+  async function runDiagnosis() {
+    setDiagnosing(true);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch(`/api/docker/${encodeURIComponent(containerId)}/diagnose`, {
+        method: "POST",
+        headers: { [CSRF_HEADER]: csrf },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDiagnosis(data.diagnosis);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Diagnosis failed");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setDiagnosing(false);
+    }
+  }
+
   function download() {
     const text = filtered
       .map((line) => {
@@ -249,6 +283,17 @@ export function LogViewer({
               className="w-full rounded-md border border-line bg-canvas py-1.5 pl-8 pr-2 text-xs outline-none focus:border-brand sm:w-44"
             />
           </div>
+
+          <button
+            type="button"
+            onClick={() => void runDiagnosis()}
+            disabled={diagnosing}
+            className="flex items-center gap-1.5 rounded-md border border-brand/40 bg-brand/5 px-2.5 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand/10 disabled:opacity-50"
+            title={t("docker.diagnose.button")}
+          >
+            <Sparkles className="size-3.5 animate-pulse" />
+            {diagnosing ? t("docker.diagnose.running") : t("docker.diagnose.button")}
+          </button>
 
           <button
             type="button"
@@ -296,6 +341,44 @@ export function LogViewer({
         <p className="rounded border border-danger/40 px-3 py-1.5 text-xs text-danger">
           {error}
         </p>
+      )}
+
+      {diagnosis && (
+        <div className="rounded-lg border border-brand/30 bg-brand/5 p-3 text-xs">
+          <div className="flex items-center justify-between gap-2 border-b border-brand/20 pb-2">
+            <div className="flex items-center gap-1.5 font-semibold text-brand">
+              <Sparkles className="size-4" />
+              <span>{t("docker.diagnose.title")}</span>
+            </div>
+            <div className="flex items-center gap-2 text-subtle">
+              <span>{t("docker.diagnose.source")}: {diagnosis.source === "jev_ai" ? "Jev System One" : "Heuristic Rules"}</span>
+              <span>·</span>
+              <span>{t("docker.diagnose.latency")}: {diagnosis.latency_ms}ms</span>
+            </div>
+          </div>
+          <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 font-medium">
+                {diagnosis.is_fatal ? (
+                  <XCircle className="size-4 text-danger" />
+                ) : diagnosis.category_label.includes("健康") ? (
+                  <CheckCircle2 className="size-4 text-ok" />
+                ) : (
+                  <AlertTriangle className="size-4 text-warn" />
+                )}
+                <span className="text-ink">{diagnosis.category_label}</span>
+                <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] text-brand">
+                  {t("docker.diagnose.confidence")}: {Math.round(diagnosis.confidence * 100)}%
+                </span>
+              </div>
+              <p className="text-subtle leading-relaxed">{diagnosis.summary}</p>
+            </div>
+            <div className="space-y-1 rounded bg-surface/50 p-2">
+              <span className="font-medium text-ink">{t("docker.diagnose.recommendation")}:</span>
+              <p className="text-subtle leading-relaxed">{diagnosis.recommendation}</p>
+            </div>
+          </div>
+        </div>
       )}
 
       <div

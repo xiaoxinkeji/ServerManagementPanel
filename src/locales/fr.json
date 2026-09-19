@@ -3790,5 +3790,21 @@
   "settings.items.docker.webhook_deploy.enabled.label": "Activer le déclencheur Webhook",
   "settings.items.docker.webhook_deploy.enabled.help": "Permet aux pipelines CI/CD externes de déclencher des mises à jour.",
   "settings.items.docker.webhook_deploy.token.label": "Jeton secret de déploiement",
-  "settings.items.docker.webhook_deploy.token.help": "Jeton secret attendu dans l'en-tête X-Deploy-Token."
+  "settings.items.docker.webhook_deploy.token.help": "Jeton secret attendu dans l'en-tête X-Deploy-Token.",
+  "settings.sections.jevAi": "Moteur de décision et diagnostic Jev System One",
+  "settings.items.ai.jev.enabled.label": "Activer le diagnostic IA Jev",
+  "settings.items.ai.jev.enabled.help": "Diagnostique les anomalies des journaux de conteneurs en quelques millisecondes avec Jev System One.",
+  "settings.items.ai.jev.endpoint.label": "Point de terminaison API Jev",
+  "settings.items.ai.jev.endpoint.help": "Point de terminaison TypeSafe Jev ou compatible (OpenRouter, Cloudflare AI Gateway, LitJev/NanoJev).",
+  "settings.items.ai.jev.api_key.label": "Clé API Jev",
+  "settings.items.ai.jev.api_key.help": "Jeton porteur pour authentifier les requêtes Jev.",
+  "settings.items.ai.jev.model.label": "Identifiant du modèle",
+  "settings.items.ai.jev.model.help": "Par défaut jev-1 ou modèle compatible.",
+  "docker.diagnose.button": "Diagnostic IA Jev",
+  "docker.diagnose.running": "Diagnostic en cours...",
+  "docker.diagnose.title": "Rapport de diagnostic intelligent Jev",
+  "docker.diagnose.confidence": "Confiance",
+  "docker.diagnose.recommendation": "Recommandation",
+  "docker.diagnose.source": "Moteur source",
+  "docker.diagnose.latency": "Latence"
 }

@@ -3790,5 +3790,21 @@
   "settings.items.docker.webhook_deploy.enabled.label": "启用 Webhook 部署触发器",
   "settings.items.docker.webhook_deploy.enabled.help": "允许外部持续集成服务 (GitHub Actions/GitLab CI) 调用 /api/v1/webhooks/deploy 自动化拉取最新镜像并重启指定容器。",
   "settings.items.docker.webhook_deploy.token.label": "Webhook 部署鉴权 Token",
-  "settings.items.docker.webhook_deploy.token.help": "外部请求时需在 X-Deploy-Token 请求头中提供该私密 Token 进行验签。"
+  "settings.items.docker.webhook_deploy.token.help": "外部请求时需在 X-Deploy-Token 请求头中提供该私密 Token 进行验签。",
+  "settings.sections.jevAi": "Jev System One 决策模型与智能诊断",
+  "settings.items.ai.jev.enabled.label": "启用 Jev AI 诊断引擎",
+  "settings.items.ai.jev.enabled.help": "启用后将调用 Jev 极速 System One 决策模型对容器异常日志与运行状态进行类型化毫秒级精准诊断与建议。",
+  "settings.items.ai.jev.endpoint.label": "Jev API 端点 (Endpoint)",
+  "settings.items.ai.jev.endpoint.help": "TypeSafe Jev 或兼容端点地址（支持 OpenRouter、Cloudflare AI Gateway 或本地自建 LitJev/NanoJev 端点）。",
+  "settings.items.ai.jev.api_key.label": "Jev API 密钥",
+  "settings.items.ai.jev.api_key.help": "用于访问 Jev 决策模型的 API Bearer Key。",
+  "settings.items.ai.jev.model.label": "模型标识 (Model ID)",
+  "settings.items.ai.jev.model.help": "默认 jev-1，也可指定兼容架构模型。",
+  "docker.diagnose.button": "Jev 智能诊断",
+  "docker.diagnose.running": "Jev 诊断中...",
+  "docker.diagnose.title": "容器状态与日志 Jev 智能诊断报告",
+  "docker.diagnose.confidence": "置信度",
+  "docker.diagnose.recommendation": "修复建议",
+  "docker.diagnose.source": "诊断引擎",
+  "docker.diagnose.latency": "耗时"
 }

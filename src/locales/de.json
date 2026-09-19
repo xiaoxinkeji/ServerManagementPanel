@@ -3790,5 +3790,21 @@
   "settings.items.docker.webhook_deploy.enabled.label": "Webhook-Trigger aktivieren",
   "settings.items.docker.webhook_deploy.enabled.help": "Ermöglicht externen CI/CD-Pipelines die Aktualisierung von Containern.",
   "settings.items.docker.webhook_deploy.token.label": "Bereitstellungs-Token",
-  "settings.items.docker.webhook_deploy.token.help": "Im X-Deploy-Token-Header erwartetes Geheimnis."
+  "settings.items.docker.webhook_deploy.token.help": "Im X-Deploy-Token-Header erwartetes Geheimnis.",
+  "settings.sections.jevAi": "Jev System One Entscheidungsmodell & KI-Diagnose",
+  "settings.items.ai.jev.enabled.label": "Jev KI-Diagnose aktivieren",
+  "settings.items.ai.jev.enabled.help": "Diagnostiziert Containerprotokollanomalien mit Jev System One-Entscheidungsmodellen in Millisekunden.",
+  "settings.items.ai.jev.endpoint.label": "Jev-API-Endpunkt",
+  "settings.items.ai.jev.endpoint.help": "TypeSafe Jev oder kompatibler Endpunkt (OpenRouter, Cloudflare AI Gateway, LitJev/NanoJev).",
+  "settings.items.ai.jev.api_key.label": "Jev-API-Schlüssel",
+  "settings.items.ai.jev.api_key.help": "API-Bearer-Token für den Zugriff auf den Jev-Dienst.",
+  "settings.items.ai.jev.model.label": "Modell-ID",
+  "settings.items.ai.jev.model.help": "Standard jev-1 oder kompatibles Modell.",
+  "docker.diagnose.button": "Jev KI-Diagnose",
+  "docker.diagnose.running": "Wird diagnostiziert...",
+  "docker.diagnose.title": "Jev Container- und Protokolldiagnosebericht",
+  "docker.diagnose.confidence": "Konfidenz",
+  "docker.diagnose.recommendation": "Empfehlung",
+  "docker.diagnose.source": "Diagnosequelle",
+  "docker.diagnose.latency": "Latenz"
 }

@@ -358,6 +358,35 @@ export const settingDefs: SettingDef[] = [
     min: 1,
     max: 1440,
   },
+  // ---------- Jev System One 决策模型与智能诊断 (AI Engine) ----------
+  {
+    key: "ai.jev.enabled",
+    group: "docker",
+    section: "jevAi",
+    type: "bool",
+    default: false,
+  },
+  {
+    key: "ai.jev.endpoint",
+    group: "docker",
+    section: "jevAi",
+    type: "string",
+    default: "https://api.typesafe.ai/v1/systemone",
+  },
+  {
+    key: "ai.jev.api_key",
+    group: "docker",
+    section: "jevAi",
+    type: "secret",
+    default: "",
+  },
+  {
+    key: "ai.jev.model",
+    group: "docker",
+    section: "jevAi",
+    type: "string",
+    default: "jev-1",
+  },
   // ---------- 外部 Webhook 触发部署 (CI/CD Deploy) ----------
   {
     key: "docker.webhook_deploy.enabled",
