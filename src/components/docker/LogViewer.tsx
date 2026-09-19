@@ -401,12 +401,6 @@ export function LogViewer({
               <Sparkles className="size-4 animate-pulse" />
               <span>{t("docker.diagnose.title")}</span>
             </div>
-        <div className="rounded-xl border border-brand/30 bg-brand/5 p-4 text-xs space-y-3 shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-brand/20 pb-2.5">
-            <div className="flex items-center gap-2 font-semibold text-brand text-sm">
-              <Sparkles className="size-4 animate-pulse" />
-              <span>{t("docker.diagnose.title")}</span>
-            </div>
             <div className="flex items-center gap-2 text-subtle text-[11px] font-mono">
               <span>{t("docker.diagnose.source")}: {diagnosis.source.includes("jev") ? "Jev System One" : "Heuristic Rules"}</span>
               <span>·</span>
