@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "Interruttore attivato",
   "docker.autoheal.crashes": "crash",
   "docker.autoheal.reset": "Reimposta",
-  "docker.autoheal.resetSuccess": "Stato dell'interruttore reimpostato con successo."
+  "docker.autoheal.resetSuccess": "Stato dell'interruttore reimpostato con successo.",
+  "docker.installer.templateTitle": "Modelli di distribuzione rapida app e IA",
+  "docker.installer.templateSubtitle": "Fai clic per compilare un modello Docker Compose verificato"
 }

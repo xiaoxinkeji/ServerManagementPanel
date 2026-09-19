@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "已触发熔断保护",
   "docker.autoheal.crashes": "次崩溃",
   "docker.autoheal.reset": "重置熔断",
-  "docker.autoheal.resetSuccess": "已成功重置该容器的自愈熔断状态。"
+  "docker.autoheal.resetSuccess": "已成功重置该容器的自愈熔断状态。",
+  "docker.installer.templateTitle": "快速部署常用应用与 AI 工作站",
+  "docker.installer.templateSubtitle": "点击一键填入经测试验证的标准 Docker Compose 编排模板"
 }

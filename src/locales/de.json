@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "Schutzschalter ausgelöst",
   "docker.autoheal.crashes": "Abstürze",
   "docker.autoheal.reset": "Zurücksetzen",
-  "docker.autoheal.resetSuccess": "Schutzschalterstatus erfolgreich zurückgesetzt."
+  "docker.autoheal.resetSuccess": "Schutzschalterstatus erfolgreich zurückgesetzt.",
+  "docker.installer.templateTitle": "Schnellstart-Vorlagen für Apps & KI",
+  "docker.installer.templateSubtitle": "Klicken Sie hier, um getestete Docker-Compose-Vorlagen einzufügen"
 }

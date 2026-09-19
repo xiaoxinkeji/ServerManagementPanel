@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "Devre Kesici Tetiklendi",
   "docker.autoheal.crashes": "çökme",
   "docker.autoheal.reset": "Sıfırla",
-  "docker.autoheal.resetSuccess": "Devre kesici durumu başarıyla sıfırlandı."
+  "docker.autoheal.resetSuccess": "Devre kesici durumu başarıyla sıfırlandı.",
+  "docker.installer.templateTitle": "Hızlı Uygulama ve Yapay Zeka Şablonları",
+  "docker.installer.templateSubtitle": "Doğrulanmış standart Docker Compose şablonunu tek tıkla doldurun"
 }

@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Finding } from "@/lib/compose/checks";
-import { FileCode, HelpCircle, Upload, XCircle } from "lucide-react";
+import { FileCode, HelpCircle, Upload, XCircle, Sparkles } from "lucide-react";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 import type { InstalledStack } from "@/lib/appstore/install";
 import type { PreflightResult } from "@/lib/appstore/preflight";
+import { PRESET_STACK_TEMPLATES } from "@/lib/appstore/templates";
 import { useT } from "@/lib/i18n/client";
 import { Rich } from "@/lib/i18n/rich";
 
@@ -241,6 +242,33 @@ export function StackInstaller({ onInstalled }: { onInstalled: () => void }) {
       )}
 
       <PreflightBanner result={data.preflight} />
+
+      {/* --- 常用应用与 AI 工作站预设模版 --- */}
+      <section className="rounded-lg border border-line bg-surface p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="size-4 text-brand" />
+          <h3 className="text-sm font-semibold">{t("docker.installer.templateTitle")}</h3>
+          <span className="text-xs text-subtle">{t("docker.installer.templateSubtitle")}</span>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {PRESET_STACK_TEMPLATES.map((tmpl) => (
+            <button
+              key={tmpl.id}
+              type="button"
+              onClick={() => {
+                setName(tmpl.defaultName);
+                setCompose(tmpl.compose);
+                setFileInfo(null);
+                setFindings(null);
+              }}
+              className="flex flex-col items-start rounded-md border border-line p-3 text-left transition-all hover:border-brand hover:bg-brand/5"
+            >
+              <span className="font-medium text-xs text-ink">{tmpl.name}</span>
+              <span className="mt-1 text-[11px] text-subtle leading-relaxed line-clamp-2">{tmpl.description}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* --- Yükleme ------------------------------------------------------ */}
       <section className="rounded-lg border border-line bg-surface">

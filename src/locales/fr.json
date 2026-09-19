@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "Disjoncteur déclenché",
   "docker.autoheal.crashes": "plantages",
   "docker.autoheal.reset": "Réinitialiser",
-  "docker.autoheal.resetSuccess": "État du disjoncteur réinitialisé avec succès."
+  "docker.autoheal.resetSuccess": "État du disjoncteur réinitialisé avec succès.",
+  "docker.installer.templateTitle": "Modèles de déploiement rapide d'applications et IA",
+  "docker.installer.templateSubtitle": "Cliquez pour remplir un modèle Docker Compose vérifié"
 }

@@ -3814,5 +3814,7 @@
   "docker.autoheal.tripped": "Circuit Breaker Tripped",
   "docker.autoheal.crashes": "crashes",
   "docker.autoheal.reset": "Reset",
-  "docker.autoheal.resetSuccess": "Circuit breaker state reset successfully."
+  "docker.autoheal.resetSuccess": "Circuit breaker state reset successfully.",
+  "docker.installer.templateTitle": "Quick Deploy Apps & AI Workstations",
+  "docker.installer.templateSubtitle": "Click to populate pre-verified production Docker Compose templates"
 }
