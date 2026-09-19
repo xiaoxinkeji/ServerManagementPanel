@@ -85,7 +85,7 @@ export const JEV_SIGNATURES: JevSignature[] = [
   },
   {
     category: "network_timeout",
-    pattern: /econnrefused|etimedout|connection refused|network is unreachable|connection reset|timed? ?out/i,
+    pattern: /econnrefused|etimedout|connection refused|network is unreachable|connection reset|timed out|timeout (exceeded|error|reached|expired|waiting)/i,
     weight: 4.2,
   },
   {
@@ -95,7 +95,7 @@ export const JEV_SIGNATURES: JevSignature[] = [
   },
   {
     category: "config_syntax_error",
-    pattern: /syntaxerror|invalid config|unexpected token|parse error|yaml|malformed/i,
+    pattern: /syntaxerror|invalid config|unexpected token|parse error|yaml.*(error|invalid|unexpected|cannot|failed)|(error|invalid|failed).*\.ya?ml\b|malformed/i,
     weight: 4.2,
   },
   {
@@ -131,7 +131,7 @@ export const JEV_SIGNATURES: JevSignature[] = [
   },
   {
     category: "auth_failure",
-    pattern: /unauthorized|401|403 forbidden|invalid (api )?key|authentication failed|access denied|invalid credentials|password authentication failed/i,
+    pattern: /unauthorized|\bforbidden\b|invalid (api )?key|authentication failed|access denied|invalid credentials|password authentication failed|\b40[13]\b\s*\(?(unauthorized|forbidden)/i,
     weight: 4.2,
   },
   {
@@ -260,9 +260,8 @@ function matchSignatures(context: string): Map<JevCategory, MatchHit> {
       const hit = hits.get(sig.category) ?? { score: 0, lines: [] };
       if (hit.lines.length === 0) {
         hit.score += sig.weight;
-      } else {
-        const extras = Math.min(hit.lines.length, 4);
-        if (extras <= 4) hit.score += sig.weight * 0.15;
+      } else if (hit.lines.length <= 4) {
+        hit.score += sig.weight * 0.15;
       }
       hit.lines.push(trimmed);
       hits.set(sig.category, hit);

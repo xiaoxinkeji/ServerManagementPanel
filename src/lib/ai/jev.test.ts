@@ -175,4 +175,24 @@ describe("Jev System One Kernel", () => {
     });
     assert.equal(res.answer, true);
   });
+
+  it("does not false-positive on yaml config loading or numeric 401 in logs", async () => {
+    const logs = `Loading config from /app/config.yaml\nServer listening on :8080\nrequest id 4011 done`;
+    const res = await diagnoseContainerLogsCore("web", logs, 0);
+    assert.equal(res.category, "normal_operation");
+  });
+
+  it("does not false-positive on configured read timeout lines", async () => {
+    const logs = `Warning: read timeout 30s configured\nlistening on 0.0.0.0:80`;
+    const res = await diagnoseContainerLogsCore("web", logs, 0);
+    assert.equal(res.category, "normal_operation");
+  });
+
+  it("caps repeat-hit bonus and evidence for repeated identical failures", async () => {
+    const logs = Array(6).fill("connect ECONNREFUSED 10.0.0.5:5432").join("\n");
+    const res = await diagnoseContainerLogsCore("api", logs, 1);
+    assert.equal(res.category, "network_timeout");
+    assert.ok(res.evidence.length <= 3);
+    assert.ok(res.confidence <= 0.99);
+  });
 });

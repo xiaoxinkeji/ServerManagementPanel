@@ -61,6 +61,7 @@ export default function AiScreen() {
   // 一键容器诊断
   const [selectedContainer, setSelectedContainer] = useState("");
   const [diagnosing, setDiagnosing] = useState(false);
+  const [diagError, setDiagError] = useState<string | null>(null);
   const [diagResult, setDiagResult] = useState<{ container?: { name: string; status: string }; diagnosis: DiagnosisResult } | null>(null);
 
   const loadData = useCallback(() => {
@@ -111,6 +112,7 @@ export default function AiScreen() {
   const handleDiagnose = async () => {
     if (!selectedContainer) return;
     setDiagnosing(true);
+    setDiagError(null);
     setDiagResult(null);
     try {
       const res = await fetch("/api/ai", {
@@ -126,10 +128,10 @@ export default function AiScreen() {
         setDiagResult(json);
         loadData(); // 刷新诊断历史
       } else {
-        alert(json.error || "Diagnosis failed");
+        setDiagError(json.error || "Diagnosis failed");
       }
     } catch {
-      alert("Network error");
+      setDiagError("Network error");
     } finally {
       setDiagnosing(false);
     }
@@ -238,6 +240,12 @@ export default function AiScreen() {
               <span>{diagnosing ? "Jev 诊断中..." : "一键 Jev 诊断"}</span>
             </button>
           </div>
+
+          {diagError && (
+            <p className="rounded border border-danger/40 px-3 py-1.5 text-xs text-danger">
+              {diagError}
+            </p>
+          )}
 
           {diagResult && (
             <div className="rounded-xl border border-brand/30 bg-brand/5 p-4">
