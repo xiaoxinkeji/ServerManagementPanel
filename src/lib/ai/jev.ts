@@ -1,5 +1,3 @@
-// Jev System One Decision Engine & Kernel
-
 export interface JevDecisionChoiceRequest {
   type: "choice";
   context: string;
@@ -41,11 +39,17 @@ export interface ContainerDiagnosisResult {
   latency_ms: number;
 }
 
+export interface JevRuntimeConfig {
+  mode?: "builtin" | "remote" | "disabled";
+  endpoint?: string;
+  apiKey?: string;
+  model?: string;
+}
+
 /**
  * 内置极速 Jev 决策模型推理内核 (Builtin System One Kernel)
- * 零额外体积开销，无需几百兆权重包，专为容器日志与系统状态设计的快速特征分布矩阵
  */
-function runBuiltinJevDecision(
+export function runBuiltinJevDecision(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
 ): JevDecisionResponse {
   const start = Date.now();
@@ -114,7 +118,7 @@ function runBuiltinJevDecision(
 /**
  * 远程 Jev System One 服务调用
  */
-async function callRemoteJev(
+export async function callRemoteJev(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
   endpoint: string,
   apiKey: string,
@@ -157,25 +161,16 @@ async function callRemoteJev(
   }
 }
 
-function getSettingSafe(key: string, fallback: string): string {
-  try {
-    const { getString } = require("@/lib/settings");
-    return getString(key) || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 /**
- * Jev 决策分发（默认 builtin 开箱即用，支持 remote）
+ * Jev 决策分发（纯逻辑，解耦 I/O 配置）
  */
-export async function askJev(
+export async function askJevCore(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
+  config: JevRuntimeConfig = { mode: "builtin" },
 ): Promise<JevDecisionResponse> {
-  const mode = getSettingSafe("ai.jev.mode", "builtin");
+  const mode = config.mode || "builtin";
 
   if (mode === "disabled") {
-    // 禁用时降级到基础启发
     return {
       answer: "unknown",
       confidence: 0.5,
@@ -184,33 +179,27 @@ export async function askJev(
     };
   }
 
-  if (mode === "remote") {
-    const endpoint = getSettingSafe("ai.jev.endpoint", "");
-    const apiKey = getSettingSafe("ai.jev.api_key", "");
-    const model = getSettingSafe("ai.jev.model", "jev-1");
-
-    if (endpoint && apiKey) {
-      const remoteRes = await callRemoteJev(request, endpoint, apiKey, model);
-      if (remoteRes) return remoteRes;
-    }
+  if (mode === "remote" && config.endpoint && config.apiKey) {
+    const remoteRes = await callRemoteJev(request, config.endpoint, config.apiKey, config.model || "jev-1");
+    if (remoteRes) return remoteRes;
   }
 
-  // 默认使用自带的内置极速 Jev 决策内核
   return runBuiltinJevDecision(request);
 }
 
 /**
- * 诊断容器日志并返回分析结果
+ * 诊断容器日志核心逻辑
  */
-export async function diagnoseContainerLogs(
+export async function diagnoseContainerLogsCore(
   containerName: string,
   logs: string,
   exitCode?: number,
+  config: JevRuntimeConfig = { mode: "builtin" },
 ): Promise<ContainerDiagnosisResult> {
   const start = Date.now();
   const cleanLogs = logs.split("\n").slice(-50).join("\n").slice(-4000);
 
-  const jevResult = await askJev({
+  const jevResult = await askJevCore({
     type: "choice",
     context: `Container: ${containerName}\nExitCode: ${exitCode ?? "running"}\nRecent Logs:\n${cleanLogs}`,
     question: "What is the primary cause of error or status in this container?",
@@ -223,7 +212,7 @@ export async function diagnoseContainerLogs(
       "normal_operation",
       "unknown",
     ],
-  });
+  }, config);
 
   const category = (typeof jevResult.answer === "string" ? jevResult.answer : "unknown") as ContainerDiagnosisResult["category"];
   const isFatal = category === "oom_killed" || category === "config_syntax_error" || category === "permission_denied";

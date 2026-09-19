@@ -1,7 +1,7 @@
 import { serverT } from "@/lib/i18n/runtime";
 import { guardApi } from "@/lib/auth/api";
 import { getDockerProvider } from "@/lib/providers";
-import { diagnoseContainerLogs } from "@/lib/ai/jev";
+import { diagnoseContainerLogs } from "@/lib/ai/jev-server";
 
 export const dynamic = "force-dynamic";
 
