@@ -360,11 +360,12 @@ export const settingDefs: SettingDef[] = [
   },
   // ---------- Jev System One 决策模型与智能诊断 (AI Engine) ----------
   {
-    key: "ai.jev.enabled",
+    key: "ai.jev.mode",
     group: "docker",
     section: "jevAi",
-    type: "bool",
-    default: false,
+    type: "enum",
+    default: "builtin",
+    options: ["builtin", "remote", "disabled"],
   },
   {
     key: "ai.jev.endpoint",
