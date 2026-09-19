@@ -114,6 +114,7 @@ export function LogViewer({
   const [font, setFont] = useState(11);
   const [diagnosing, setDiagnosing] = useState(false);
   const [diagnosis, setDiagnosis] = useState<{
+    category: string;
     category_label: string;
     is_fatal: boolean;
     can_autoheal: boolean;
@@ -122,6 +123,7 @@ export function LogViewer({
     recommendation: string;
     source: string;
     latency_ms: number;
+    evidence?: string[];
   } | null>(null);
 
   const boxRef = useRef<HTMLDivElement>(null);
@@ -351,7 +353,7 @@ export function LogViewer({
               <span>{t("docker.diagnose.title")}</span>
             </div>
             <div className="flex items-center gap-2 text-subtle">
-              <span>{t("docker.diagnose.source")}: {diagnosis.source === "jev_ai" ? "Jev System One" : "Heuristic Rules"}</span>
+              <span>{t("docker.diagnose.source")}: {diagnosis.source === "builtin_jev" ? t("docker.diagnose.engineBuiltin") : diagnosis.source === "remote_jev" ? t("docker.diagnose.engineRemote") : t("docker.diagnose.engineRules")}</span>
               <span>·</span>
               <span>{t("docker.diagnose.latency")}: {diagnosis.latency_ms}ms</span>
             </div>
@@ -361,7 +363,7 @@ export function LogViewer({
               <div className="flex items-center gap-1.5 font-medium">
                 {diagnosis.is_fatal ? (
                   <XCircle className="size-4 text-danger" />
-                ) : diagnosis.category_label.includes("健康") ? (
+                ) : diagnosis.category === "normal_operation" ? (
                   <CheckCircle2 className="size-4 text-ok" />
                 ) : (
                   <AlertTriangle className="size-4 text-warn" />
@@ -372,6 +374,16 @@ export function LogViewer({
                 </span>
               </div>
               <p className="text-subtle leading-relaxed">{diagnosis.summary}</p>
+              {diagnosis.evidence && diagnosis.evidence.length > 0 && (
+                <div className="mt-1">
+                  <span className="font-medium text-ink">{t("docker.diagnose.evidence")}:</span>
+                  <ul className="mt-0.5 space-y-0.5 font-mono text-[10px] text-subtle">
+                    {diagnosis.evidence.map((line, i) => (
+                      <li key={i} className="truncate">{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <div className="space-y-1 rounded bg-surface/50 p-2">
               <span className="font-medium text-ink">{t("docker.diagnose.recommendation")}:</span>

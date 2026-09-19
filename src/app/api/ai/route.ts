@@ -1,5 +1,7 @@
 import { guardApi } from "@/lib/auth/api";
 import { askJevCore, type JevDecisionChoiceRequest, type JevDecisionScoreRequest, type JevDecisionBooleanRequest } from "@/lib/ai/jev";
+import { diagnoseContainerById } from "@/lib/ai/jev-server";
+import { listDiagnoses, diagnosisStats } from "@/lib/ai/history";
 import { getDockerProvider } from "@/lib/providers";
 import { getString } from "@/lib/settings";
 
@@ -37,19 +39,29 @@ export async function GET(request: Request) {
       model,
     },
     containers,
+    history: listDiagnoses({ limit: 30 }),
+    stats: diagnosisStats(),
   });
 }
 
 export async function POST(request: Request) {
-  const guard = await guardApi(request, "panel.view");
+  let body: {
+    action?: "ask" | "diagnose";
+    containerId?: string;
+    request?: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest;
+  };
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  // diagnose 动作涉及容器日志读取，需要 docker.view 权限
+  const permission = body.action === "diagnose" ? "docker.view" : "panel.view";
+  const guard = await guardApi(request, permission);
   if (!guard.ok) return guard.response;
 
   try {
-    const body = (await request.json()) as {
-      action?: "ask" | "diagnose";
-      request?: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest;
-    };
-
     if (body.action === "ask" && body.request) {
       const mode = (getString("ai.jev.mode") || "builtin") as "builtin" | "remote" | "disabled";
       const res = await askJevCore(body.request, {
@@ -59,6 +71,14 @@ export async function POST(request: Request) {
         model: getString("ai.jev.model") || "jev-1",
       });
       return Response.json({ ok: true, result: res });
+    }
+
+    if (body.action === "diagnose" && body.containerId) {
+      const result = await diagnoseContainerById(body.containerId, "manual");
+      if (!result) {
+        return Response.json({ error: "Container not found" }, { status: 404 });
+      }
+      return Response.json({ ok: true, ...result });
     }
 
     return Response.json({ error: "Invalid action" }, { status: 400 });

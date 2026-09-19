@@ -388,6 +388,15 @@ export const settingDefs: SettingDef[] = [
     type: "string",
     default: "jev-1",
   },
+  {
+    key: "ai.jev.history_keep",
+    group: "docker",
+    section: "jevAi",
+    type: "int",
+    default: 500,
+    min: 50,
+    max: 10000,
+  },
   // ---------- 外部 Webhook 触发部署 (CI/CD Deploy) ----------
   {
     key: "docker.webhook_deploy.enabled",

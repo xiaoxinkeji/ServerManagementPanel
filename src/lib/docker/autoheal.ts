@@ -6,6 +6,7 @@ import { announce } from "@/lib/alerts/announce";
 import { audit } from "@/lib/auth/audit";
 import { panelContainerName } from "@/lib/host/self";
 import { diagnoseContainerLogsCore } from "@/lib/ai/jev";
+import { recordDiagnosis } from "@/lib/ai/history";
 
 /**
  * 智能故障自愈与熔断引擎 (Auto-Healing Engine)
@@ -153,6 +154,13 @@ export async function handleContainerCrash(
         endpoint: getString("ai.jev.endpoint"),
         apiKey: getString("ai.jev.api_key"),
         model: getString("ai.jev.model") || "jev-1",
+      });
+
+      recordDiagnosis({
+        containerId,
+        containerName,
+        trigger: "autoheal",
+        diagnosis: diag,
       });
 
       if (diag.is_fatal && !diag.can_autoheal && diag.confidence >= 0.85) {
