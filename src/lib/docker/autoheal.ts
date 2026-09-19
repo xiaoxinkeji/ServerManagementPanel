@@ -1,10 +1,11 @@
 import "server-only";
 
 import { getDockerProvider } from "@/lib/providers";
-import { getBool, getNumber } from "@/lib/settings";
+import { getBool, getNumber, getString } from "@/lib/settings";
 import { announce } from "@/lib/alerts/announce";
 import { audit } from "@/lib/auth/audit";
 import { panelContainerName } from "@/lib/host/self";
+import { diagnoseContainerLogsCore } from "@/lib/ai/jev";
 
 /**
  * 智能故障自愈与熔断引擎 (Auto-Healing Engine)
@@ -134,7 +135,54 @@ export async function handleContainerCrash(
     return;
   }
 
-  // 2. 在重试配额内，自动执行拉起重启
+  // 2. 检查 Jev AI 智能守卫：如果是不可自愈的严重语法/权限硬伤，直接智能熔断避免盲目拉起
+  const jevMode = getString("ai.jev.mode") || "builtin";
+  let jevAdvice = "";
+  if (jevMode !== "disabled") {
+    try {
+      const provider = getDockerProvider();
+      const logChunks: string[] = [];
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 1500);
+      for await (const line of provider.logs(containerId, { tail: 30, follow: false, signal: ctrl.signal })) {
+        logChunks.push(typeof line === "string" ? line : line.text);
+      }
+      clearTimeout(t);
+      const diag = await diagnoseContainerLogsCore(containerName, logChunks.join("\n"), exitCode, {
+        mode: jevMode as "builtin" | "remote" | "disabled",
+        endpoint: getString("ai.jev.endpoint"),
+        apiKey: getString("ai.jev.api_key"),
+        model: getString("ai.jev.model") || "jev-1",
+      });
+
+      if (diag.is_fatal && !diag.can_autoheal && diag.confidence >= 0.85) {
+        // Jev 判断属于硬性致命错误（如配置文件语法错误、权限拒绝），自愈无意义，执行智能熔断
+        record.tripped = true;
+        await announce({
+          alertKey: `autoheal:circuit_breaker:${containerName}`,
+          source: "docker",
+          severity: "critical",
+          title: `容器 ${containerName} Jev 智能熔断`,
+          detail: `Jev 诊断发现硬性致命故障【${diag.category_label}】(置信度 ${Math.round(diag.confidence * 100)}%)：${diag.summary}。已智能阻断盲目重启。建议: ${diag.recommendation}`,
+        }).catch(console.error);
+
+        audit({
+          username: "autoheal",
+          action: "docker.autoheal.circuit_breaker",
+          targetType: "container",
+          targetId: containerName,
+          detail: `Jev 智能决策提前熔断: ${diag.category_label} - ${diag.recommendation}`,
+          result: "error",
+        });
+        return;
+      }
+      jevAdvice = ` [Jev诊断: ${diag.category_label}]`;
+    } catch {
+      // 容错降级，不阻断正常自愈流程
+    }
+  }
+
+  // 3. 在重试配额内，自动执行拉起重启
   record.restarting = true;
   try {
     const provider = getDockerProvider();
@@ -145,7 +193,7 @@ export async function handleContainerCrash(
       action: "docker.autoheal.restart",
       targetType: "container",
       targetId: containerName,
-      detail: `自动故障自愈: 检测到容器 ${reason === "oom" ? "OOM 内存溢出" : `异常退出 (${exitCode})`}，正在执行第 ${record.count}/${maxRetries} 次自动重启`,
+      detail: `自动故障自愈: 检测到容器 ${reason === "oom" ? "OOM 内存溢出" : `异常退出 (${exitCode})`}，正在执行第 ${record.count}/${maxRetries} 次自动重启${jevAdvice}`,
       result: "ok",
     });
 
@@ -154,7 +202,7 @@ export async function handleContainerCrash(
       source: "docker",
       severity: "warning",
       title: `容器 ${containerName} 故障自动重启`,
-      detail: `自愈引擎已尝试重新拉起该容器 (第 ${record.count}/${maxRetries} 次尝试)。原因: ${reason === "oom" ? "OOM 内存溢出" : `异常退出 (Code: ${exitCode})`}。`,
+      detail: `自愈引擎已尝试重新拉起该容器 (第 ${record.count}/${maxRetries} 次尝试)。原因: ${reason === "oom" ? "OOM 内存溢出" : `异常退出 (Code: ${exitCode})`}${jevAdvice}。`,
     }).catch(console.error);
   } catch (error) {
     console.error(`[autoheal] 无法重启容器 ${containerName}:`, error);
