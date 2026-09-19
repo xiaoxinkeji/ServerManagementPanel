@@ -3724,5 +3724,13 @@
   "bookmarks.invalidUrl": "The address is not valid (e.g. https://example.com).",
   "oui.downloadFailed": "Could not download the OUI list: {error}",
   "widgetsLib.unknown": "Unknown widget: {key}",
-  "widgetsLib.unknownAction": "Unknown action: {action}"
+  "widgetsLib.unknownAction": "Unknown action: {action}",
+  "settings.sections.webhook": "Webhook",
+  "settings.items.notify.webhook.enabled.label": "Enabled",
+  "settings.items.notify.webhook.url.label": "Webhook URL address",
+  "settings.items.notify.webhook.secret.label": "Bearer Token / Secret (optional)",
+  "settings.items.notify.webhook.min_level.label": "Minimum level",
+  "settings.items.notify.webhook.min_level.options.info": "Info and above",
+  "settings.items.notify.webhook.min_level.options.warning": "Warning and above",
+  "settings.items.notify.webhook.min_level.options.critical": "Critical only"
 }

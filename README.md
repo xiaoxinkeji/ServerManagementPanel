@@ -6,7 +6,7 @@ A self-hosted management panel written for a single Linux + Docker server. It br
 
 Designed at home-server (homelab) scale: a single container, embedded SQLite, no external database or queue. The interface and all text are in Turkish.
 
-> **Version:** 1.9.0 · **Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
+> **Version:** 2.0.0 · **Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
 
 ---
 

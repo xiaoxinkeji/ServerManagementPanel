@@ -3724,5 +3724,13 @@
   "bookmarks.invalidUrl": "Adres geçerli değil (ör. https://example.com).",
   "oui.downloadFailed": "OUI listesi indirilemedi: {error}",
   "widgetsLib.unknown": "Bilinmeyen widget: {key}",
-  "widgetsLib.unknownAction": "Bilinmeyen aksiyon: {action}"
+  "widgetsLib.unknownAction": "Bilinmeyen aksiyon: {action}",
+  "settings.sections.webhook": "Webhook",
+  "settings.items.notify.webhook.enabled.label": "Etkin",
+  "settings.items.notify.webhook.url.label": "Webhook URL adresi",
+  "settings.items.notify.webhook.secret.label": "Gizli anahtar / Secret (isteğe bağlı)",
+  "settings.items.notify.webhook.min_level.label": "En düşük seviye",
+  "settings.items.notify.webhook.min_level.options.info": "Bilgi ve üstü",
+  "settings.items.notify.webhook.min_level.options.warning": "Uyarı ve üstü",
+  "settings.items.notify.webhook.min_level.options.critical": "Yalnızca kritik"
 }

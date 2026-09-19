@@ -6,7 +6,7 @@ Tek bir Linux + Docker sunucusu için yazılmış, kendi sunucunda barındırdı
 
 Ev sunucusu (homelab) ölçeği düşünülerek tasarlandı: tek container, gömülü SQLite, harici veritabanı ya da kuyruk yok. Arayüz ve tüm metinler Türkçedir.
 
-> **Sürüm:** 1.9.0 · **Yığın:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
+> **Sürüm:** 2.0.0 · **Yığın:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
 
 ---
 

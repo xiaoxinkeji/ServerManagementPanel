@@ -6,7 +6,7 @@
 
 专为家庭服务器 (Homelab) 规模打造：单容器部署，内置嵌入式 SQLite，无须外部数据库或消息队列。支持简体中文、英文、土耳其语、德语、法语、意大利语等多语言。
 
-> **版本：** 1.9.0 · **技术栈：** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
+> **版本：** 2.0.0 · **技术栈：** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
 
 ---
 

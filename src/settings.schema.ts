@@ -1008,6 +1008,7 @@ export const settingDefs: SettingDef[] = [
     { key: "token", type: "secret" },
   ]),
   ...notifyChannel("discord", [{ key: "webhook", type: "secret" }]),
+  ...notifyChannel("webhook", [{ key: "url", type: "string" }, { key: "secret", type: "secret" }]),
   ...notifyChannel("email", [
     { key: "smtp_host", type: "string" },
     { key: "smtp_port", type: "int", default: 587 },

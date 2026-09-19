@@ -214,6 +214,41 @@ const discord: NotifyChannel = {
   },
 };
 
+// --- Webhook (通用 Webhook / 企业微信 / 钉钉 / 飞书兼容) -----------------
+
+const webhook: NotifyChannel = {
+  key: "webhook",
+  label: "Webhook",
+  problem() {
+    return missing([[serverT("notify.missing.webhook"), getString("notify.webhook.url")]]);
+  },
+  async send(message) {
+    const url = normalizeBaseUrl(getString("notify.webhook.url"));
+    const secret = getString("notify.webhook.secret").trim();
+
+    // 通用 JSON 载荷，兼顾自建服务与常见推送平台
+    const payload: Record<string, unknown> = {
+      event: "alert",
+      title: message.title,
+      message: message.detail,
+      severity: message.severity,
+      subject: subject(message),
+      timestamp: new Date().toISOString(),
+      // 钉钉 / 企业微信文本字段兼容
+      text: { content: plainText(message) },
+      msgtype: "text",
+    };
+
+    const headers: Record<string, string> = {};
+    if (secret) {
+      headers["authorization"] = `Bearer ${secret}`;
+      headers["x-webhook-secret"] = secret;
+    }
+
+    await postJson(url, payload, headers);
+  },
+};
+
 // --- E-posta ---------------------------------------------------------------
 
 const email: NotifyChannel = {
@@ -258,6 +293,7 @@ export const notifyChannels: NotifyChannel[] = [
   homeAssistant,
   ntfy,
   discord,
+  webhook,
   email,
 ];
 

@@ -3724,5 +3724,13 @@
   "bookmarks.invalidUrl": "地址无效（例如 https://example.com）。",
   "oui.downloadFailed": "无法下载 OUI 列表：{error}",
   "widgetsLib.unknown": "未知的小组件：{key}",
-  "widgetsLib.unknownAction": "未知操作：{action}"
+  "widgetsLib.unknownAction": "未知操作：{action}",
+  "settings.sections.webhook": "Webhook (通用 / 钉钉 / 飞书 / 企业微信)",
+  "settings.items.notify.webhook.enabled.label": "启用",
+  "settings.items.notify.webhook.url.label": "Webhook URL 地址",
+  "settings.items.notify.webhook.secret.label": "Bearer 认证密钥 / Secret (可选)",
+  "settings.items.notify.webhook.min_level.label": "最低通知级别",
+  "settings.items.notify.webhook.min_level.options.info": "信息及以上",
+  "settings.items.notify.webhook.min_level.options.warning": "警告及以上",
+  "settings.items.notify.webhook.min_level.options.critical": "仅严重"
 }

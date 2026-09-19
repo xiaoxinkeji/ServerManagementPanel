@@ -40,7 +40,7 @@ services:
       - "${DOCKER_GID}"
     environment:
       MOCK_MODE: ${MOCK_MODE:-0}
-      APP_VERSION: ${APP_VERSION:-1.9.0}
+      APP_VERSION: ${APP_VERSION:-2.0.0}
       TZ: ${TZ:-Asia/Shanghai}
       MASTER_KEY: ${MASTER_KEY}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
