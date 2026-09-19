@@ -95,9 +95,25 @@ Live status, service cards, and maintenance widgets in one place.
 </td>
 <td width="50%">
 
+**Applications**
+![Applications](screenshots/apps.png)
+Quick access card dashboard with service status.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
 **Monitoring**
 ![Monitoring](screenshots/izleme.png)
 CPU, memory, disk and network history with adjustable time ranges.
+
+</td>
+<td width="50%">
+
+**Docker**
+![Docker](screenshots/docker.png)
+Container list with live status, CPU/memory, and quick actions.
 
 </td>
 </tr>
@@ -120,20 +136,11 @@ Notification channels and the merged event feed.
 <tr>
 <td width="50%">
 
-**Docker**
-![Docker](screenshots/docker.png)
-Container list with live status, CPU/memory, and quick actions.
-
-</td>
-<td width="50%">
-
 **Backup**
 ![Backup](screenshots/yedekleme.png)
 restic-based scheduled backups and run history.
 
 </td>
-</tr>
-<tr>
 <td width="50%">
 
 **Server**
@@ -141,6 +148,8 @@ restic-based scheduled backups and run history.
 Console, power controls, systemd units, and compose stacks.
 
 </td>
+</tr>
+<tr>
 <td width="50%">
 
 **Panel Jobs**
@@ -148,16 +157,11 @@ Console, power controls, systemd units, and compose stacks.
 Background job schedule, status, and run/error counts.
 
 </td>
-</tr>
-<tr>
 <td width="50%">
 
 **Host Tasks**
 ![Host Tasks](screenshots/host-gorevleri.png)
 Panel-managed and host crontab tasks side by side.
-
-</td>
-<td width="50%">
 
 </td>
 </tr>
