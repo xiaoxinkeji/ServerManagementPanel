@@ -195,4 +195,50 @@ describe("Jev System One Kernel", () => {
     assert.ok(res.evidence.length <= 3);
     assert.ok(res.confidence <= 0.99);
   });
+
+  it("treats 'unhealthy' as an error signal, not a healthy signal", async () => {
+    const res = await diagnoseContainerLogsCore("app", "status: unhealthy\nhealthcheck failed", 1);
+    assert.equal(res.category, "unhealthy");
+  });
+
+  it("falls back to unknown when no signature matches", async () => {
+    const decision = await askJevCore({
+      type: "choice",
+      context: "foo bar baz",
+      question: "What is the primary cause?",
+      options: [
+        "oom_killed",
+        "network_timeout",
+        "config_syntax_error",
+        "permission_denied",
+        "database_error",
+        "disk_full",
+        "port_conflict",
+        "missing_dependency",
+        "dns_failure",
+        "auth_failure",
+        "unhealthy",
+        "normal_operation",
+        "unknown",
+      ],
+    });
+    assert.equal(decision.answer, "unknown");
+    assert.ok(decision.confidence <= 0.6);
+  });
+
+  it("handles negated health questions with correct polarity", async () => {
+    const broken = await askJevCore({
+      type: "boolean",
+      context: "Error: connect ECONNREFUSED 127.0.0.1:3306",
+      question: "Is the container unhealthy?",
+    });
+    assert.equal(broken.answer, true);
+
+    const healthy = await askJevCore({
+      type: "boolean",
+      context: "Server listening on 0.0.0.0:8080, status: up",
+      question: "Is the container unhealthy?",
+    });
+    assert.equal(healthy.answer, false);
+  });
 });

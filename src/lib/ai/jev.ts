@@ -229,7 +229,7 @@ export const JEV_CATEGORY_META: Record<
 };
 
 const HEALTHY_PATTERN =
-  /healthy|status: up|listening on|ready on|exitcode:\s*0|normal operational|started successfully/i;
+  /(?<!un)healthy|status: up|listening on|ready on|exitcode:\s*0|normal operational|started successfully/i;
 const EXITED_PATTERN = /exitcode:\s*(?!0\b)\d+|status:\s*(exited|dead)|\bkilled\b/i;
 const FATAL_WORD_PATTERN = /fatal|panic|segfault|crash/i;
 const DB_WORD_PATTERN = /sql|mysql|postgres|redis|mongo|database|prisma|sqlite/i;
@@ -312,14 +312,17 @@ export function runBuiltinJevDecision(
       scores.set(opt, 0.05); // 基础平滑概率
     }
 
+    let anyScored = false;
     if (scores.has("normal_operation") && hasHealthySignal && !hasFatalHit && !isExplicitExited) {
       scores.set("normal_operation", 5.0);
+      anyScored = true;
     }
 
     // 只有请求里给出的候选类别才参与打分
     for (const [category, hit] of hits.entries()) {
       if (!scores.has(category)) continue;
       scores.set(category, (scores.get(category) || 0) + hit.score);
+      anyScored = true;
     }
 
     // 计算 Softmax / 最大后验概率
@@ -333,6 +336,11 @@ export function runBuiltinJevDecision(
         maxScore = s;
         bestOption = opt;
       }
+    }
+
+    // 没有任何特征命中时回退到 unknown，避免随机挑选一个基础分相同的选项
+    if (!anyScored && scores.has("unknown")) {
+      bestOption = "unknown";
     }
 
     const confidence = Math.min(Math.max(Math.exp(maxScore) / (sum || 1), 0.55), 0.99);
@@ -379,7 +387,10 @@ export function runBuiltinJevDecision(
   }
 
   // 3. Boolean / Noul 模式：依据问题极性返回布尔判定
-  const positiveQuestion = /healthy|ok\b|normal|ready|running|alive|fine/i.test(request.question);
+  const q = request.question;
+  const negatedHealth = /unhealthy|not (healthy|ok|ready|running|alive|fine)|abnormal|down\b|broken|failing/i.test(q);
+  const positiveQuestion =
+    !negatedHealth && /healthy|ok\b|normal|ready|running|alive|fine/i.test(q);
   const answer = positiveQuestion ? hasHealthySignal && !errorHit : errorHit;
 
   return {

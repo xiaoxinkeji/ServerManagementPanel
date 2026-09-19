@@ -156,12 +156,16 @@ export async function handleContainerCrash(
         model: getString("ai.jev.model") || "jev-1",
       });
 
-      recordDiagnosis({
-        containerId,
-        containerName,
-        trigger: "autoheal",
-        diagnosis: diag,
-      });
+      try {
+        recordDiagnosis({
+          containerId,
+          containerName,
+          trigger: "autoheal",
+          diagnosis: diag,
+        });
+      } catch (e) {
+        console.error("[autoheal] recordDiagnosis failed", e);
+      }
 
       if (diag.is_fatal && !diag.can_autoheal && diag.confidence >= 0.85) {
         // Jev 判断属于硬性致命错误（如配置文件语法错误、权限拒绝），自愈无意义，执行智能熔断
