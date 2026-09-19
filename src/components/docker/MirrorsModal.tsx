@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Gauge, Globe, Loader2, RefreshCw, Server, X } from "lucide-react";
+import { Check, Gauge, Globe, Loader2, X } from "lucide-react";
 import { useT } from "@/lib/i18n/client";
 import { readCsrfToken } from "./detail/shared";
 import { CSRF_HEADER } from "@/lib/auth/types";
@@ -26,18 +26,31 @@ export function MirrorsModal({
 
   useEffect(() => {
     if (!open) return;
-    setLoading(true);
-    setMessage(null);
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        setLoading(true);
+        setMessage(null);
+      }
+    });
+
     fetch("/api/docker/mirrors")
       .then((r) => r.json())
       .then((data) => {
+        if (!active) return;
         setPresets(data.presets || []);
         setSelected(data.currentMirrors || []);
       })
       .catch(() => {
-        setMessage({ ok: false, text: t("common.errors.network") });
+        if (active) setMessage({ ok: false, text: t("common.errors.network") });
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [open, t]);
 
   async function testLatency(url: string) {
