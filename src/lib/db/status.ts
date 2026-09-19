@@ -14,6 +14,9 @@ export type DbStatus = {
   backupBytes: number;
 };
 
+let cachedIntegrity: { ok: boolean; at: number } | null = null;
+const INTEGRITY_CACHE_MS = 60_000;
+
 /** /api/health ve ileride Panel İşleri ekranı için özet. */
 export function dbStatus(): DbStatus {
   const db = getDb();
@@ -21,9 +24,18 @@ export function dbStatus(): DbStatus {
   const journal = db.prepare("PRAGMA journal_mode").get() as {
     journal_mode: string;
   };
-  const integrity = db.prepare("PRAGMA quick_check").get() as {
-    quick_check: string;
-  };
+
+  let integrityOk = true;
+  if (cachedIntegrity && Date.now() - cachedIntegrity.at < INTEGRITY_CACHE_MS) {
+    integrityOk = cachedIntegrity.ok;
+  } else {
+    const integrity = db.prepare("PRAGMA quick_check").get() as {
+      quick_check: string;
+    };
+    integrityOk = integrity?.quick_check === "ok";
+    cachedIntegrity = { ok: integrityOk, at: Date.now() };
+  }
+
   const hosts = db.prepare("SELECT COUNT(*) AS n FROM hosts").get() as { n: number };
 
   let sizeBytes = 0;
@@ -37,7 +49,7 @@ export function dbStatus(): DbStatus {
     schemaVersion: currentVersion(),
     journalMode: journal.journal_mode,
     sizeBytes,
-    integrityOk: integrity.quick_check === "ok",
+    integrityOk,
     hostCount: hosts.n,
     backupBytes: migrationBackupBytes(),
   };

@@ -105,13 +105,33 @@ export function validateValue(def: SettingDef, value: unknown): string | null {
   }
 }
 
+const rowCache = new Map<string, { row: Row | undefined; at: number }>();
+const ROW_CACHE_MS = 5000;
+
+function cacheKey(key: string, scopeType: SettingScope, scopeId: string): string {
+  return `${key}:${scopeType}:${scopeId}`;
+}
+
+export function clearSettingsCache(): void {
+  rowCache.clear();
+}
+
 function readRow(key: string, scopeType: SettingScope, scopeId: string): Row | undefined {
-  return getDb()
+  const ck = cacheKey(key, scopeType, scopeId);
+  const cached = rowCache.get(ck);
+  if (cached && Date.now() - cached.at < ROW_CACHE_MS) {
+    return cached.row;
+  }
+
+  const row = getDb()
     .prepare(
       `SELECT value, value_encrypted, iv, auth_tag FROM settings
        WHERE key = ? AND scope_type = ? AND scope_id = ?`,
     )
     .get(key, scopeType, scopeId) as Row | undefined;
+
+  rowCache.set(ck, { row, at: Date.now() });
+  return row;
 }
 
 /**
@@ -258,6 +278,7 @@ export function setSetting(
         : `${key}: ${previous} → ${String(value)}`,
   });
 
+  clearSettingsCache();
   return { ok: true };
 }
 
@@ -271,6 +292,8 @@ export function resetSetting(
   getDb()
     .prepare("DELETE FROM settings WHERE key = ? AND scope_type = ? AND scope_id = ?")
     .run(key, options.scopeType ?? "global", options.scopeId ?? "");
+
+  clearSettingsCache();
 
   audit({
     userId: options.userId,
@@ -345,6 +368,7 @@ export function seedFromEnv(): string[] {
       `INSERT OR IGNORE INTO settings (key, scope_type, scope_id, value, updated_by)
        VALUES (?, 'global', '', ?, 'env')`,
     ).run(def.key, raw);
+    clearSettingsCache();
     seeded.push(`${def.key}=${raw}`);
   }
 
