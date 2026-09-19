@@ -1,5 +1,6 @@
 import "server-only";
 
+import os from "node:os";
 import { getDockerProvider } from "@/lib/providers";
 
 /**
@@ -12,10 +13,20 @@ import { getDockerProvider } from "@/lib/providers";
  *
  * Ad sabit yazılmıyor: compose proje adı (yani dizin adı) değişince volume adı
  * da değişir ve sabit yazılmış bir ad sessizce yanlış yeri gösterirdi.
+ * Container içinde os.hostname() doğrudan container ID'yi verir.
  */
 
+let resolvedName: string | null = null;
+
 export function panelContainerName(): string {
-  return process.env.PANEL_CONTAINER_NAME ?? "server-panel-panel-1";
+  if (process.env.PANEL_CONTAINER_NAME) return process.env.PANEL_CONTAINER_NAME;
+  if (resolvedName) return resolvedName;
+  // Container içindeyken hostname container'ın short ID'sidir
+  const host = os.hostname();
+  if (host && /^[0-9a-f]{12,64}$/i.test(host)) {
+    return host;
+  }
+  return "server-panel-panel-1";
 }
 
 let cached: { name: string | null; at: number } | null = null;
@@ -33,8 +44,12 @@ export async function panelImage(): Promise<string | null> {
 
   try {
     const raw = (await getDockerProvider().inspectRaw(panelContainerName())) as {
+      Name?: string;
       Config?: { Image?: string };
     } | null;
+    if (raw?.Name) {
+      resolvedName = raw.Name.replace(/^\//, "");
+    }
     const name = raw?.Config?.Image ?? null;
     cachedImage = { name, at: Date.now() };
     return name;
@@ -49,8 +64,12 @@ export async function panelDataVolume(): Promise<string | null> {
 
   try {
     const raw = (await getDockerProvider().inspectRaw(panelContainerName())) as {
+      Name?: string;
       Mounts?: { Type?: string; Name?: string; Destination?: string }[];
     } | null;
+    if (raw?.Name) {
+      resolvedName = raw.Name.replace(/^\//, "");
+    }
 
     const mount = raw?.Mounts?.find((entry) => entry.Destination === "/app/data");
     const name = mount?.Type === "volume" && mount.Name ? mount.Name : null;

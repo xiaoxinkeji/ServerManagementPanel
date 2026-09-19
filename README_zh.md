@@ -90,7 +90,7 @@
 
 **总览仪表盘**
 ![总览](screenshots/genel-bakis.png)
-实时状态、服务卡片与维护组件一目了然。
+实时状态、天气与时钟组件、快捷搜索。
 
 </td>
 <td width="50%">
@@ -106,7 +106,7 @@ CPU、内存、磁盘与网络历史趋势，支持自选时间范围。
 
 **Docker 容器管理**
 ![Docker](screenshots/docker.png)
-容器列表、状态切换、资源占用与快捷操作。
+容器列表、状态切换、实时资源占用与快捷终端。
 
 </td>
 <td width="50%">
@@ -114,6 +114,50 @@ CPU、内存、磁盘与网络历史趋势，支持自选时间范围。
 **服务状态探针**
 ![服务状态](screenshots/servis-durumu.png)
 探针列表、响应延迟与 60 天在线率。
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**事件中心与告警**
+![事件与通知](screenshots/olaylar.png)
+实时捕获容器异常、OOM 崩溃与告警推送。
+
+</td>
+<td width="50%">
+
+**定时数据备份**
+![备份](screenshots/yedekleme.png)
+基于 restic 的自动化定时备份与历史快照。
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**宿主机控制台与服务**
+![宿主机](screenshots/sunucu.png)
+控制台命令执行、电源控制与 systemd 单元管理。
+
+</td>
+<td width="50%">
+
+**面板任务与后台任务调度**
+![面板任务](screenshots/panel-isleri.png)
+后台采集、日志汇聚与安全巡检任务调度状态。
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**宿主机定时任务 (Crontab)**
+![宿主机任务](screenshots/host-gorevleri.png)
+可视化查看与配置宿主机系统计划任务。
+
+</td>
+<td width="50%">
 
 </td>
 </tr>

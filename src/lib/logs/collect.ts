@@ -15,6 +15,7 @@ import {
   writeCursor,
   type IncomingLine,
 } from "./store";
+import { panelContainerName } from "@/lib/host/self";
 import type { LogLevel } from "./types";
 
 /**
@@ -94,10 +95,10 @@ async function collectContainers(outcome: CollectOutcome): Promise<IncomingLine[
   // Panelin kendi logları toplanmıyor: her toplama turu kendi satırlarını
   // yazar, o satırlar bir sonraki turda toplanır ve sistem kendi kuyruğunu
   // yiyerek büyür.
-  const own = process.env.PANEL_CONTAINER_NAME ?? "server-panel-panel-1";
+  const own = panelContainerName();
 
   for (const container of targets) {
-    if (container.name === own) continue;
+    if (container.name === own || container.id.startsWith(own) || own.startsWith(container.id)) continue;
 
     const since = readCursor(container.name);
     let newest = since;

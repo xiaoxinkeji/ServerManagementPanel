@@ -68,7 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         {/*
           Sözlük prop olarak geçiyor: sağlayıcı iki dili birden içe aktarsaydı
           ikisinin tüm metni istemci paketine girerdi. Kök layout burada
