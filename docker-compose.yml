@@ -1,10 +1,6 @@
 services:
   panel:
-    build:
-      context: .
-      args:
-        APP_VERSION: ${APP_VERSION:-2.0.0}
-    image: ${PANEL_IMAGE:-server-panel:local}
+    image: ${PANEL_IMAGE:-ghcr.io/xiaoxinkeji/servermanagementpanel:latest}
     restart: unless-stopped
     # docker.sock kök:docker sahipliğinde ve 0660 modunda; panel root olmayan
     # bir kullanıcı (uid 1001) ile çalıştığı için soketi ancak host'un docker
