@@ -180,6 +180,55 @@ export function DockerScreen({
   */
   const [agGorunumu, setAgGorunumu] = useState<"harita" | "liste">("liste");
   const [mirrorsOpen, setMirrorsOpen] = useState(false);
+  const [autohealStatus, setAutohealStatus] = useState<Array<{
+    container: string;
+    crashCount: number;
+    tripped: boolean;
+    lastCrashAt: number;
+  }>>([]);
+
+  useEffect(() => {
+    let ignore = false;
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/docker/autoheal", { cache: "no-store" });
+        if (res.ok && !ignore) {
+          const json = await res.json();
+          setAutohealStatus(json.status || []);
+        }
+      } catch {
+        // 忽略
+      }
+    };
+    const timer = setInterval(() => void fetchStatus(), 10000);
+    void fetchStatus();
+    return () => {
+      ignore = true;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const resetAutoheal = async (containerName: string) => {
+    try {
+      const res = await fetch("/api/docker/autoheal", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          [CSRF_HEADER]: readCsrfToken(),
+        },
+        body: JSON.stringify({ container: containerName }),
+      });
+      if (res.ok) {
+        const refresh = await fetch("/api/docker/autoheal", { cache: "no-store" });
+        if (refresh.ok) {
+          const json = await refresh.json();
+          setAutohealStatus(json.status || []);
+        }
+      }
+    } catch {
+      // 忽略
+    }
+  };
 
   /*
     Satırın geri çağrıları tek nesnede: `ContainerRow` hem burada hem Stack
@@ -637,6 +686,36 @@ export function DockerScreen({
 
       {tab === "containers" && (
         <>
+          {autohealStatus.filter((s) => s.tripped).length > 0 && (
+            <div className="mb-4 rounded-lg border border-danger/40 bg-danger/10 p-3 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-danger">
+                <AlertTriangle className="size-4" />
+                <span>{t("docker.autoheal.cardTitle")}</span>
+              </div>
+              <div className="mt-2 space-y-2">
+                {autohealStatus.filter((s) => s.tripped).map((s) => (
+                  <div key={s.container} className="flex flex-wrap items-center justify-between gap-2 rounded bg-surface/80 px-2.5 py-1.5 border border-danger/20">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-medium text-ink">{s.container}</span>
+                      <span className="rounded bg-danger/20 px-1.5 py-0.5 text-[10px] text-danger">
+                        {t("docker.autoheal.tripped")} ({s.crashCount} {t("docker.autoheal.crashes")})
+                      </span>
+                    </div>
+                    {canAct && (
+                      <button
+                        type="button"
+                        onClick={() => void resetAutoheal(s.container)}
+                        className="rounded border border-line bg-surface px-2 py-1 text-xs text-subtle hover:border-brand hover:text-brand"
+                      >
+                        {t("docker.autoheal.reset")}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
       {secimSutunu && secilenler.length > 0 && (
         <BulkBar
           selected={secilenler}

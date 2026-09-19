@@ -3809,5 +3809,10 @@
   "docker.diagnose.confidence": "Confidenza",
   "docker.diagnose.recommendation": "Raccomandazione",
   "docker.diagnose.source": "Origine motore",
-  "docker.diagnose.latency": "Latenza"
+  "docker.diagnose.latency": "Latenza",
+  "docker.autoheal.cardTitle": "Monitor di auto-ripristino e interruttore",
+  "docker.autoheal.tripped": "Interruttore attivato",
+  "docker.autoheal.crashes": "crash",
+  "docker.autoheal.reset": "Reimposta",
+  "docker.autoheal.resetSuccess": "Stato dell'interruttore reimpostato con successo."
 }

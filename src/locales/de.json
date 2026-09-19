@@ -3809,5 +3809,10 @@
   "docker.diagnose.confidence": "Konfidenz",
   "docker.diagnose.recommendation": "Empfehlung",
   "docker.diagnose.source": "Diagnosequelle",
-  "docker.diagnose.latency": "Latenz"
+  "docker.diagnose.latency": "Latenz",
+  "docker.autoheal.cardTitle": "Auto-Healing & Schutzschalter-Monitor",
+  "docker.autoheal.tripped": "Schutzschalter ausgelöst",
+  "docker.autoheal.crashes": "Abstürze",
+  "docker.autoheal.reset": "Zurücksetzen",
+  "docker.autoheal.resetSuccess": "Schutzschalterstatus erfolgreich zurückgesetzt."
 }

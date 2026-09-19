@@ -3809,5 +3809,10 @@
   "docker.diagnose.confidence": "置信度",
   "docker.diagnose.recommendation": "修复建议",
   "docker.diagnose.source": "诊断引擎",
-  "docker.diagnose.latency": "耗时"
+  "docker.diagnose.latency": "耗时",
+  "docker.autoheal.cardTitle": "智能自愈与熔断监控",
+  "docker.autoheal.tripped": "已触发熔断保护",
+  "docker.autoheal.crashes": "次崩溃",
+  "docker.autoheal.reset": "重置熔断",
+  "docker.autoheal.resetSuccess": "已成功重置该容器的自愈熔断状态。"
 }

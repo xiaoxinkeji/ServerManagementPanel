@@ -3809,5 +3809,10 @@
   "docker.diagnose.confidence": "Güven Oranı",
   "docker.diagnose.recommendation": "Çözüm Önerisi",
   "docker.diagnose.source": "Motor Kaynağı",
-  "docker.diagnose.latency": "Gecikme"
+  "docker.diagnose.latency": "Gecikme",
+  "docker.autoheal.cardTitle": "Otomatik İyileştirme ve Devre Kesici İzleme",
+  "docker.autoheal.tripped": "Devre Kesici Tetiklendi",
+  "docker.autoheal.crashes": "çökme",
+  "docker.autoheal.reset": "Sıfırla",
+  "docker.autoheal.resetSuccess": "Devre kesici durumu başarıyla sıfırlandı."
 }

@@ -3809,5 +3809,10 @@
   "docker.diagnose.confidence": "Confidence",
   "docker.diagnose.recommendation": "Recommendation",
   "docker.diagnose.source": "Engine Source",
-  "docker.diagnose.latency": "Latency"
+  "docker.diagnose.latency": "Latency",
+  "docker.autoheal.cardTitle": "Auto-Healing & Circuit Breaker Monitor",
+  "docker.autoheal.tripped": "Circuit Breaker Tripped",
+  "docker.autoheal.crashes": "crashes",
+  "docker.autoheal.reset": "Reset",
+  "docker.autoheal.resetSuccess": "Circuit breaker state reset successfully."
 }
