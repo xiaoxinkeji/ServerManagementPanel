@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Sparkles, Brain, ShieldCheck, Terminal, Cpu, History, Activity } from "lucide-react";
+import { Sparkles, Brain, ShieldCheck, Terminal, Cpu, History, Activity, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 
 function readCsrfToken(): string {
@@ -63,6 +63,47 @@ export default function AiScreen() {
   const [diagnosing, setDiagnosing] = useState(false);
   const [diagError, setDiagError] = useState<string | null>(null);
   const [diagResult, setDiagResult] = useState<{ container?: { name: string; status: string }; diagnosis: DiagnosisResult } | null>(null);
+
+  // 全机一键健康体检
+  const [healthChecking, setHealthChecking] = useState(false);
+  const [healthReport, setHealthReport] = useState<{
+    score: number;
+    rating: string;
+    checkedAt: number;
+    summary: {
+      totalContainers: number;
+      unhealthyContainers: number;
+      crashedContainers: number;
+      totalIssues: number;
+      criticalIssues: number;
+    };
+    issues: Array<{
+      id: string;
+      source: string;
+      title: string;
+      category: string;
+      severity: string;
+      description: string;
+      jevConfidence: number;
+      recommendation: string;
+      commands: string[];
+    }>;
+  } | null>(null);
+
+  const runHealthCheck = async () => {
+    setHealthChecking(true);
+    try {
+      const res = await fetch("/api/ai/health-report");
+      if (res.ok) {
+        const json = await res.json();
+        setHealthReport(json.report);
+      }
+    } catch {
+      // 忽略
+    } finally {
+      setHealthChecking(false);
+    }
+  };
 
   const loadData = useCallback(() => {
     fetch("/api/ai")
@@ -160,17 +201,102 @@ export default function AiScreen() {
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-1 rounded-2xl border border-line/50 bg-surface/80 p-4 font-mono text-xs">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-ok" />
-              <span className="font-semibold text-ink">
-                {config?.mode === "builtin" ? "内置本地内核 (Built-in)" : config?.mode === "remote" ? "远程云端 API" : "禁用"}
-              </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={healthChecking}
+              onClick={runHealthCheck}
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand/90 active:scale-95 disabled:opacity-50"
+            >
+              <Sparkles className="size-4" />
+              <span>{healthChecking ? "正在全机深度体检..." : "全机一键 AI 体检"}</span>
+            </button>
+
+            <div className="flex flex-col items-end gap-1 rounded-2xl border border-line/50 bg-surface/80 p-3.5 font-mono text-xs">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-ok" />
+                <span className="font-semibold text-ink">
+                  {config?.mode === "builtin" ? "内置本地内核 (Built-in)" : config?.mode === "remote" ? "远程云端 API" : "禁用"}
+                </span>
+              </div>
+              <span className="text-[11px] text-subtle">推理延迟: {lastLatency != null ? `~${lastLatency}ms` : "—"}</span>
+              <span className="text-[11px] text-subtle">模型: {config?.model || "jev-1"}</span>
             </div>
-            <span className="text-[11px] text-subtle">推理延迟: {lastLatency != null ? `~${lastLatency}ms` : "—"}</span>
-            <span className="text-[11px] text-subtle">模型: {config?.model || "jev-1"}</span>
           </div>
         </div>
+
+        {/* 健康体检大盘报告卡片 */}
+        {healthReport && (
+          <div className="mt-6 rounded-2xl border border-line/80 bg-surface/90 p-5 shadow-xs animate-in fade-in">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line/50 pb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex size-12 items-center justify-center rounded-2xl font-bold text-lg ${
+                    healthReport.score >= 90
+                      ? "bg-ok/10 text-ok border border-ok/30"
+                      : healthReport.score >= 75
+                      ? "bg-brand/10 text-brand border border-brand/30"
+                      : healthReport.score >= 50
+                      ? "bg-warn/10 text-warn border border-warn/30"
+                      : "bg-danger/10 text-danger border border-danger/30"
+                  }`}
+                >
+                  {healthReport.score}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-ink">全系统综合健康度: {healthReport.rating}</span>
+                    <span className="text-xs text-subtle font-mono">
+                      (耗时检测完成于 {new Date(healthReport.checkedAt).toLocaleTimeString()})
+                    </span>
+                  </div>
+                  <p className="text-xs text-subtle mt-0.5">
+                    已体检 {healthReport.summary.totalContainers} 个容器，发现 {healthReport.summary.totalIssues} 项隐患，其中 {healthReport.summary.criticalIssues} 项严重。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {healthReport.issues.length === 0 ? (
+              <p className="mt-4 text-xs text-ok font-medium flex items-center gap-1.5">
+                <CheckCircle2 className="size-4" /> 完美！所有运行容器与系统资源负载均处于优秀健康区间。
+              </p>
+            ) : (
+              <div className="mt-4 space-y-2.5">
+                {healthReport.issues.map((iss) => (
+                  <div key={iss.id} className="rounded-xl border border-line/60 bg-canvas/40 p-3.5 text-xs space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 font-medium text-ink">
+                        {iss.severity === "critical" ? (
+                          <XCircle className="size-4 text-danger shrink-0" />
+                        ) : (
+                          <AlertTriangle className="size-4 text-warn shrink-0" />
+                        )}
+                        <span>{iss.title}</span>
+                        <span className="rounded-full bg-line/60 px-2 py-0.5 text-[10px] font-mono text-subtle">
+                          {iss.category}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-mono text-brand font-semibold">
+                        Jev置信度: {Math.round(iss.jevConfidence * 100)}%
+                      </span>
+                    </div>
+                    <p className="text-subtle leading-relaxed">{iss.description}</p>
+                    <div className="rounded-lg bg-surface/80 p-2.5 border border-line/40">
+                      <span className="font-semibold text-ink">专家建议: </span>
+                      <span className="text-subtle">{iss.recommendation}</span>
+                    </div>
+                    {iss.commands && iss.commands.length > 0 && (
+                      <div className="rounded-lg bg-canvas p-2 font-mono text-[11px] text-ink overflow-x-auto border border-line/40">
+                        <pre>{iss.commands.join("\n")}</pre>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 核心特性与架构能力展示 */}
