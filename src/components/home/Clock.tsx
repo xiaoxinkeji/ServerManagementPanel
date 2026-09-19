@@ -35,13 +35,13 @@ export function Clock({ big = false }: { big?: boolean }) {
   return (
     <div>
       <div
-        className={`font-semibold tracking-tight tabular-nums bg-gradient-to-r from-ink via-ink to-subtle bg-clip-text text-transparent ${big ? "text-6xl" : "text-3xl"}`}
+        className={`font-semibold tracking-tighter tabular-nums text-ink ${big ? "text-6xl" : "text-4xl"}`}
         // Boşken de aynı yüksekliği kaplasın; yoksa saat gelince sayfa zıplıyor.
         style={{ minHeight: "1em" }}
       >
         {now ? f.time(now) : " "}
       </div>
-      <div className={`text-subtle ${big ? "mt-1 text-lg" : "text-xs"}`}>
+      <div className={`text-subtle font-medium tracking-wide ${big ? "mt-1.5 text-base" : "mt-0.5 text-xs"}`}>
         {now
           ? f.date(now, { weekday: "long", day: "numeric", month: "long" })
           : " "}

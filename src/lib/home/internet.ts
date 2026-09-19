@@ -19,7 +19,6 @@ import { getString } from "@/lib/settings";
 
 const CACHE_KEY = "home:internet";
 const CACHE_TTL = 60;
-const TIMEOUT_MS = 5_000;
 
 export type InternetStatus = {
   online: boolean;
@@ -34,25 +33,30 @@ export type InternetStatus = {
 async function probe(): Promise<{ online: boolean; latencyMs: number | null }> {
   if (isMockMode()) return { online: true, latencyMs: 18 };
 
-  const url = getString("home.internet_check_url").trim();
-  if (!url) return { online: false, latencyMs: null };
+  const url = (getString("home.internet_check_url").trim() || "https://connectivitycheck.gstatic.com/generate_204");
+  const fallbackUrls = [
+    url,
+    "https://connectivitycheck.gstatic.com/generate_204",
+    "https://www.baidu.com",
+    "https://cp.cloudflare.com/generate_204",
+  ];
 
   const started = Date.now();
-  try {
-    // HEAD yeterli: gövdeyi indirmenin anlamı yok ve bazı hedefler büyük
-    // sayfalar döndürüyor. Yönlendirme takip edilmiyor — 3xx de "ulaşılabilir"
-    // demektir, hedefin nereye gittiği bizi ilgilendirmiyor.
-    const response = await fetch(url, {
-      method: "HEAD",
-      redirect: "manual",
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-    // 4xx/5xx bile bir CEVAPTIR: sunucuya ulaşıldıysa internet çalışıyordur.
-    void response.status;
-    return { online: true, latencyMs: Date.now() - started };
-  } catch {
-    return { online: false, latencyMs: null };
+  for (const target of [...new Set(fallbackUrls)]) {
+    try {
+      const response = await fetch(target, {
+        method: "HEAD",
+        redirect: "manual",
+        signal: AbortSignal.timeout(3000),
+      });
+      void response.status;
+      return { online: true, latencyMs: Date.now() - started };
+    } catch {
+      // 尝试下一个候选目标
+    }
   }
+
+  return { online: false, latencyMs: null };
 }
 
 export async function internetStatus(): Promise<InternetStatus> {

@@ -51,15 +51,15 @@ export function InternetIndicator({
         };
 
   return (
-    <div className={`flex items-center gap-4.5 rounded-xl border p-5 shadow-2xs backdrop-blur-xs transition-all duration-200 ${view.ring}`}>
-      <div className={`flex shrink-0 items-center justify-center rounded-xl p-2.5 ${!status.online ? "bg-danger/10" : broken ? "bg-warn/10" : "bg-ok/10"}`}>
-        <view.Icon className={`${view.tone} ${big ? "size-14" : "size-7"}`} aria-hidden />
+    <div className={`flex items-center gap-4 rounded-2xl border p-5 shadow-xs backdrop-blur-md transition-all duration-300 ${view.ring}`}>
+      <div className={`flex shrink-0 items-center justify-center rounded-2xl p-3 ${!status.online ? "bg-danger/10" : broken ? "bg-warn/10" : "bg-ok/10"}`}>
+        <view.Icon className={`${view.tone} ${big ? "size-12" : "size-6"}`} aria-hidden />
       </div>
       <div className="min-w-0">
-        <div className={`font-semibold tracking-tight ${view.tone} ${big ? "text-3xl" : "text-base"}`}>
+        <div className={`font-semibold tracking-tight ${view.tone} ${big ? "text-2xl" : "text-base"}`}>
           {view.title}
         </div>
-        <p className={`text-subtle mt-0.5 leading-relaxed ${big ? "mt-1 text-base" : "text-xs"}`}>{view.detail}</p>
+        <p className={`text-subtle leading-relaxed ${big ? "mt-1 text-sm" : "mt-0.5 text-xs"}`}>{view.detail}</p>
       </div>
     </div>
   );

@@ -814,7 +814,7 @@ export const settingDefs: SettingDef[] = [
     group: "home",
     section: "internetIndicator",
     type: "string",
-    default: "https://1.1.1.1",
+    default: "https://connectivitycheck.gstatic.com/generate_204",
   },
   {
     key: "home.kiosk_refresh",

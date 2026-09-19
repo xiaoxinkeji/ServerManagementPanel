@@ -97,7 +97,7 @@ export default async function OverviewPage() {
    */
   const widgets: Record<string, React.ReactNode> = {
     clock: (
-      <section className="flex h-full flex-wrap items-center justify-between gap-4 rounded-xl border border-line/80 bg-surface/80 p-5 shadow-xs transition-shadow hover:shadow-sm">
+      <section className="flex h-full flex-wrap items-center justify-between gap-4 rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-line hover:shadow-sm">
         <Clock />
         {weather.ok && <WeatherCard weather={weather.weather} label={locationLabel} />}
       </section>
@@ -107,21 +107,21 @@ export default async function OverviewPage() {
     apps: <AppSections groups={apps} />,
     maintenance: <MaintenanceSection canAct={hasPermission(session.user, "docker.action")} />,
     system: (
-      <section className="rounded-xl border border-line/80 bg-surface/80 p-5 shadow-xs transition-shadow hover:shadow-sm">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold tracking-tight">{t("overview.system")}</h2>
-          <span className="text-xs text-subtle font-mono">
+      <section className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-line hover:shadow-sm">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line/40 pb-3">
+          <h2 className="text-base font-semibold tracking-tight text-ink">{t("overview.system")}</h2>
+          <span className="text-[11px] font-mono font-medium text-subtle px-2 py-0.5 rounded-full bg-canvas border border-line/50">
             {isMockMode()
               ? t("overview.mock")
               : t("overview.live")}
           </span>
         </div>
 
-        <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+        <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
           {facts.map((fact) => (
-            <div key={fact.label} className="min-w-0 rounded-lg p-2 transition-colors hover:bg-canvas/60">
-              <dt className="text-xs text-subtle">{fact.label}</dt>
-              <dd className="truncate text-sm font-medium mt-0.5" title={fact.value}>
+            <div key={fact.label} className="min-w-0 rounded-xl p-3 bg-canvas/40 border border-line/30 transition-all hover:bg-canvas hover:border-line/60">
+              <dt className="text-[11px] font-medium tracking-wide text-subtle uppercase">{fact.label}</dt>
+              <dd className="truncate text-sm font-semibold tracking-tight text-ink mt-1" title={fact.value}>
                 {fact.value}
               </dd>
             </div>
