@@ -123,8 +123,15 @@ export async function resolveCaddyContainerName(preferredName?: string): Promise
       }
     }
 
-    // 2. Çalışan caddy container'larını ara
-    const anyCaddy = list.find((c) => c.image.includes("caddy") || c.name.includes("caddy"));
+    // 2. 精确匹配运行中的标准 Caddy 容器，避免误匹配包含 caddy 字符的业务应用
+    const anyCaddy = list.find(
+      (c) =>
+        c.name === "caddy" ||
+        c.name.endsWith("-caddy-1") ||
+        c.labels["com.docker.compose.service"] === "caddy" ||
+        c.image.startsWith("caddy:") ||
+        c.image.includes("/caddy:"),
+    );
     if (anyCaddy) {
       cachedCaddy = { name: anyCaddy.name, at: Date.now() };
       return anyCaddy.name;

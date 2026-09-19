@@ -57,11 +57,25 @@ async function postJson(
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<void> {
+  const parsed = new URL(url);
+  // 禁止访问本地环回与链路本地地址以防御 SSRF
+  const hostname = parsed.hostname.toLowerCase();
+  if (
+    hostname === "169.254.169.254" ||
+    hostname === "metadata.google.internal" ||
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1"
+  ) {
+    throw new Error(serverT("notify.urlBlocked"));
+  }
+
   const response = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json", ...headers },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(TIMEOUT_MS),
+    redirect: "manual",
   });
 
   if (!response.ok) {
@@ -249,6 +263,104 @@ const webhook: NotifyChannel = {
   },
 };
 
+// --- Bark (iOS 推送) -------------------------------------------------------
+
+const SAFE_KEY_RE = /^[a-zA-Z0-9_-]+$/;
+
+const bark: NotifyChannel = {
+  key: "bark",
+  label: "Bark",
+  problem() {
+    const key = getString("notify.bark.device_key").trim();
+    if (!key) return missing([[serverT("notify.bark.deviceKey"), ""]]);
+    if (!SAFE_KEY_RE.test(key)) return serverT("notify.invalidKeyFormat");
+    return null;
+  },
+  async send(message) {
+    const rawServer = getString("notify.bark.server").trim();
+    const server = rawServer ? normalizeBaseUrl(rawServer) : "https://api.day.app";
+    const deviceKey = getString("notify.bark.device_key").trim();
+    if (!SAFE_KEY_RE.test(deviceKey)) throw new Error(serverT("notify.invalidKeyFormat"));
+
+    // 采用 Bark 标准 POST /push 接口，避免在 URL path 中拼接 key
+    const url = `${server}/push`;
+
+    const levelMap: Record<Severity, string> = {
+      ok: "passive",
+      info: "active",
+      warning: "timeSensitive",
+      critical: "critical",
+    };
+
+    await postJson(url, {
+      device_key: deviceKey,
+      title: subject(message),
+      body: message.detail,
+      level: levelMap[message.severity] || "active",
+      badge: message.severity === "critical" ? 1 : 0,
+      group: "ServerPanel",
+    });
+  },
+};
+
+// --- Server酱 (微信推送) ----------------------------------------------------
+
+const serverchan: NotifyChannel = {
+  key: "serverchan",
+  label: "Server酱",
+  problem() {
+    const key = getString("notify.serverchan.sendkey").trim();
+    if (!key) return missing([[serverT("notify.serverchan.sendkey"), ""]]);
+    if (!SAFE_KEY_RE.test(key)) return serverT("notify.invalidKeyFormat");
+    return null;
+  },
+  async send(message) {
+    const sendkey = getString("notify.serverchan.sendkey").trim();
+    if (!SAFE_KEY_RE.test(sendkey)) throw new Error(serverT("notify.invalidKeyFormat"));
+    const url = `https://sctapi.ftqq.com/${encodeURIComponent(sendkey)}.send`;
+
+    const level = serverT(SEVERITY_LABEL[message.severity]);
+    await postJson(url, {
+      title: subject(message),
+      desp: `${message.detail}\n\n**${level}** · ${new Date().toISOString()}`,
+    });
+  },
+};
+
+// --- PushPlus (推送加) -----------------------------------------------------
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const pushplus: NotifyChannel = {
+  key: "pushplus",
+  label: "PushPlus",
+  problem() {
+    return missing([
+      [serverT("notify.pushplus.token"), getString("notify.pushplus.token")],
+    ]);
+  },
+  async send(message) {
+    const token = getString("notify.pushplus.token").trim();
+    const topic = getString("notify.pushplus.topic").trim();
+    const level = serverT(SEVERITY_LABEL[message.severity]);
+
+    await postJson("https://www.pushplus.plus/send", {
+      token,
+      title: subject(message),
+      content: `${escapeHtml(message.detail)}<br/><br/><strong>${level}</strong> · ${new Date().toISOString()}`,
+      template: "html",
+      topic: topic || undefined,
+    });
+  },
+};
+
 // --- E-posta ---------------------------------------------------------------
 
 const email: NotifyChannel = {
@@ -294,6 +406,9 @@ export const notifyChannels: NotifyChannel[] = [
   ntfy,
   discord,
   webhook,
+  bark,
+  serverchan,
+  pushplus,
   email,
 ];
 

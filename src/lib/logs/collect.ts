@@ -98,7 +98,13 @@ async function collectContainers(outcome: CollectOutcome): Promise<IncomingLine[
   const own = panelContainerName();
 
   for (const container of targets) {
-    if (container.name === own || container.id.startsWith(own) || own.startsWith(container.id)) continue;
+    // 自身容器检测保护，防止因名称为空或过短产生误匹配
+    const isSelf =
+      Boolean(own) &&
+      (container.name === own ||
+        (own.length >= 12 && container.id.startsWith(own)) ||
+        (container.id.length >= 12 && own.startsWith(container.id)));
+    if (isSelf) continue;
 
     const since = readCursor(container.name);
     let newest = since;
