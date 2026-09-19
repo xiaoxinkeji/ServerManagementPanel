@@ -24,6 +24,7 @@ import {
   Thermometer,
   UsersRound,
   Waypoints,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -99,6 +100,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { href: "/panel", labelKey: "nav.items.overview", icon: LayoutDashboard, permission: "panel.view" },
       { href: "/apps", labelKey: "nav.items.apps", icon: LayoutGrid, permission: "panel.view" },
+      { href: "/ai", labelKey: "nav.items.ai", icon: Sparkles, permission: "panel.view" },
     ],
   },
   {
