@@ -5,6 +5,7 @@ import path from "node:path";
 import { getDockerProvider } from "@/lib/providers";
 import { serverT } from "@/lib/i18n/runtime";
 import { getString } from "@/lib/settings";
+import { resolveCaddyContainerName } from "@/lib/host/self";
 import { listProxyHosts, type ProxyHost } from "./store";
 
 /**
@@ -103,7 +104,7 @@ export type ReloadResult = { ok: boolean; message: string };
  * biçimi kullanılıyor.
  */
 export async function reloadCaddy(): Promise<ReloadResult> {
-  const container = getString("proxy.caddy_container").trim() || "caddy";
+  const container = await resolveCaddyContainerName(getString("proxy.caddy_container"));
 
   try {
     const result = await getDockerProvider().runOnce(container, [

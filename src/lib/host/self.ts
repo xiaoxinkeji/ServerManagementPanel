@@ -79,3 +79,59 @@ export async function panelDataVolume(): Promise<string | null> {
     return null;
   }
 }
+
+let cachedCaddy: { name: string; at: number } | null = null;
+
+/**
+ * Caddy container adı: ayarda belirtilen container varsa o kullanılır,
+ * yoksa aynı compose projesindeki veya çalışan caddy container'ı otomatik çözümlenir.
+ */
+export async function resolveCaddyContainerName(preferredName?: string): Promise<string> {
+  const preferred = preferredName?.trim() || "";
+  const provider = getDockerProvider();
+
+  if (preferred) {
+    try {
+      const inspect = await provider.inspect(preferred);
+      if (inspect) return preferred;
+    } catch {
+      // Bulunamadıysa otomatik keşfe düş
+    }
+  }
+
+  if (cachedCaddy && Date.now() - cachedCaddy.at < CACHE_MS) {
+    return cachedCaddy.name;
+  }
+
+  try {
+    const list = await provider.list(true);
+    // 1. Aynı compose projesindeki caddy servisini ara
+    const ownInspect = (await provider.inspectRaw(panelContainerName())) as {
+      Config?: { Labels?: Record<string, string> };
+    } | null;
+    const project = ownInspect?.Config?.Labels?.["com.docker.compose.project"];
+
+    if (project) {
+      const composeCaddy = list.find(
+        (c) =>
+          c.labels["com.docker.compose.project"] === project &&
+          (c.labels["com.docker.compose.service"] === "caddy" || c.name.includes("caddy")),
+      );
+      if (composeCaddy) {
+        cachedCaddy = { name: composeCaddy.name, at: Date.now() };
+        return composeCaddy.name;
+      }
+    }
+
+    // 2. Çalışan caddy container'larını ara
+    const anyCaddy = list.find((c) => c.image.includes("caddy") || c.name.includes("caddy"));
+    if (anyCaddy) {
+      cachedCaddy = { name: anyCaddy.name, at: Date.now() };
+      return anyCaddy.name;
+    }
+  } catch {
+    // Docker listeleme başarısızsa
+  }
+
+  return preferred || "server-panel-caddy-1";
+}
