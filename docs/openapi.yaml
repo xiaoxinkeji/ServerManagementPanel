@@ -1125,6 +1125,48 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "429": { $ref: "#/components/responses/RateLimited" }
 
+  /api/v1/webhooks/deploy:
+    post:
+      tags: [Docker]
+      operationId: triggerWebhookDeploy
+      summary: Webhook ile konteyner dağıtımı / yeniden başlatma
+      description: |
+        Harici CI/CD iş akışlarının X-Deploy-Token başlığı ile çağırıp
+        imaj çekmesini ve konteyneri yeniden başlatmasını sağlar.
+      security: []
+      parameters:
+        - in: header
+          name: X-Deploy-Token
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                target: { type: string, default: "container" }
+                name: { type: string }
+                pull: { type: boolean, default: true }
+      responses:
+        "200":
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  target: { type: string }
+                  name: { type: string }
+                  restarted: { type: boolean }
+        "400": { $ref: "#/components/responses/InvalidRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
 components:
   securitySchemes:
     bearerAuth:

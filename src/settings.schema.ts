@@ -332,6 +332,47 @@ export const settingDefs: SettingDef[] = [
     min: 2,
     max: 50,
   },
+  // ---------- 智能故障自愈 (Auto-Healing) ----------
+  {
+    key: "docker.autoheal.enabled",
+    group: "docker",
+    section: "autoheal",
+    type: "bool",
+    default: true,
+  },
+  {
+    key: "docker.autoheal.max_retries",
+    group: "docker",
+    section: "autoheal",
+    type: "int",
+    default: 3,
+    min: 1,
+    max: 20,
+  },
+  {
+    key: "docker.autoheal.window_minutes",
+    group: "docker",
+    section: "autoheal",
+    type: "int",
+    default: 10,
+    min: 1,
+    max: 1440,
+  },
+  // ---------- 外部 Webhook 触发部署 (CI/CD Deploy) ----------
+  {
+    key: "docker.webhook_deploy.enabled",
+    group: "docker",
+    section: "webhookDeploy",
+    type: "bool",
+    default: false,
+  },
+  {
+    key: "docker.webhook_deploy.token",
+    group: "docker",
+    section: "webhookDeploy",
+    type: "secret",
+    default: "",
+  },
   {
     key: "docker.stop_timeout",
     group: "docker",

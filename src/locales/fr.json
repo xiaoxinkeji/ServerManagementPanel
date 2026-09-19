@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "Miroirs prédéfinis",
   "docker.mirrors.testLatency": "Tester la latence et la connexion",
   "docker.mirrors.customTitle": "Ajouter un miroir personnalisé",
-  "docker.mirrors.saved": "Miroirs de registre enregistrés avec succès."
+  "docker.mirrors.saved": "Miroirs de registre enregistrés avec succès.",
+  "settings.sections.autoheal": "Auto-guérison et disjoncteur (Auto-Healing)",
+  "settings.items.docker.autoheal.enabled.label": "Activer l'auto-guérison",
+  "settings.items.docker.autoheal.enabled.help": "Redémarre automatiquement les conteneurs en cas de plantage inattendu ou d'OOM.",
+  "settings.items.docker.autoheal.max_retries.label": "Tentatives maximales",
+  "settings.items.docker.autoheal.max_retries.help": "Tentatives maximales avant déclenchement du disjoncteur.",
+  "settings.items.docker.autoheal.window_minutes.label": "Fenêtre de temps (minutes)",
+  "settings.items.docker.autoheal.window_minutes.help": "Fenêtre d'évaluation des plantages successifs.",
+  "settings.sections.webhookDeploy": "Déclencheur de déploiement Webhook (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "Activer le déclencheur Webhook",
+  "settings.items.docker.webhook_deploy.enabled.help": "Permet aux pipelines CI/CD externes de déclencher des mises à jour.",
+  "settings.items.docker.webhook_deploy.token.label": "Jeton secret de déploiement",
+  "settings.items.docker.webhook_deploy.token.help": "Jeton secret attendu dans l'en-tête X-Deploy-Token."
 }

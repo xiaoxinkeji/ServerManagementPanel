@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "Vordefinierte Spiegelserver",
   "docker.mirrors.testLatency": "Latenz und Verbindung testen",
   "docker.mirrors.customTitle": "Benutzerdefinierten Spiegel hinzufügen",
-  "docker.mirrors.saved": "Registry-Spiegel erfolgreich gespeichert."
+  "docker.mirrors.saved": "Registry-Spiegel erfolgreich gespeichert.",
+  "settings.sections.autoheal": "Automatische Fehlerbehebung (Auto-Healing)",
+  "settings.items.docker.autoheal.enabled.label": "Auto-Healing aktivieren",
+  "settings.items.docker.autoheal.enabled.help": "Startet Container bei unerwarteten Abstürzen oder OOM automatisch neu.",
+  "settings.items.docker.autoheal.max_retries.label": "Maximale Wiederholungen",
+  "settings.items.docker.autoheal.max_retries.help": "Maximale Neustartversuche vor Auslösen des Schutzschalters.",
+  "settings.items.docker.autoheal.window_minutes.label": "Zeitfenster (Minuten)",
+  "settings.items.docker.autoheal.window_minutes.help": "Zeitfenster zur Zählung aufeinanderfolgender Abstürze.",
+  "settings.sections.webhookDeploy": "Webhook-Bereitstellungstrigger (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "Webhook-Trigger aktivieren",
+  "settings.items.docker.webhook_deploy.enabled.help": "Ermöglicht externen CI/CD-Pipelines die Aktualisierung von Containern.",
+  "settings.items.docker.webhook_deploy.token.label": "Bereitstellungs-Token",
+  "settings.items.docker.webhook_deploy.token.help": "Im X-Deploy-Token-Header erwartetes Geheimnis."
 }

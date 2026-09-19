@@ -130,7 +130,7 @@ export function hashToken(token: string): string {
 }
 
 export function safeEquals(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  return bufA.length === bufB.length && timingSafeEqual(bufA, bufB);
+  const hashA = createHash("sha256").update(a).digest();
+  const hashB = createHash("sha256").update(b).digest();
+  return timingSafeEqual(hashA, hashB);
 }

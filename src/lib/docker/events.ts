@@ -7,6 +7,7 @@ import { recordEvent } from "@/lib/alerts/store";
 import { isMockMode } from "@/lib/env";
 import { getBool } from "@/lib/settings";
 import { classify, type DockerEventRaw } from "./eventmap";
+import { handleContainerCrash } from "./autoheal";
 
 /**
  * Docker olay akışına abonelik (M3.32).
@@ -57,6 +58,13 @@ async function handle(raw: DockerEventRaw): Promise<void> {
   if (!event) return;
 
   sonZaman = Math.max(sonZaman, event.ts);
+
+  // 故障自愈检测: 捕捉 OOM 或异常退出非零 code 的 die 事件
+  if (event.action === "oom") {
+    void handleContainerCrash(event.containerId, event.containerName, "oom");
+  } else if (event.action === "die" && typeof event.exitCode === "number" && event.exitCode !== 0 && event.exitCode !== 143) {
+    void handleContainerCrash(event.containerId, event.containerName, "die", event.exitCode);
+  }
 
   if (!event.notify) {
     recordEvent({

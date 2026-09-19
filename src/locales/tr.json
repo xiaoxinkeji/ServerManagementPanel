@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "Hazır Ayna Kaynakları",
   "docker.mirrors.testLatency": "Gecikme ve bağlantı testi",
   "docker.mirrors.customTitle": "Özel Ayna Ekle",
-  "docker.mirrors.saved": "Kayıt defteri aynaları başarıyla kaydedildi."
+  "docker.mirrors.saved": "Kayıt defteri aynaları başarıyla kaydedildi.",
+  "settings.sections.autoheal": "Otomatik İyileştirme ve Devre Kesici",
+  "settings.items.docker.autoheal.enabled.label": "Otomatik İyileştirmeyi Etkinleştir",
+  "settings.items.docker.autoheal.enabled.help": "Beklenmeyen çıkış veya OOM çökmelerinde konteyneri otomatik yeniden başlatır.",
+  "settings.items.docker.autoheal.max_retries.label": "Azami yeniden deneme",
+  "settings.items.docker.autoheal.max_retries.help": "Devre kesici tetiklenmeden önce izin verilen azami yeniden başlatma sayısı.",
+  "settings.items.docker.autoheal.window_minutes.label": "Değerlendirme penceresi (dakika)",
+  "settings.items.docker.autoheal.window_minutes.help": "Ardışık çökmeleri değerlendirme süresi.",
+  "settings.sections.webhookDeploy": "Webhook Dağıtım Tetikleyicisi (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "Webhook Dağıtımını Etkinleştir",
+  "settings.items.docker.webhook_deploy.enabled.help": "Harici CI/CD iş akışlarının /api/v1/webhooks/deploy üzerinden konteyner güncellemesini sağlar.",
+  "settings.items.docker.webhook_deploy.token.label": "Dağıtım Gizli Belirteci",
+  "settings.items.docker.webhook_deploy.token.help": "X-Deploy-Token başlığında beklenen kimlik doğrulama belirteci."
 }

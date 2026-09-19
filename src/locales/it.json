@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "Mirror predefiniti",
   "docker.mirrors.testLatency": "Testa latenza e connessione",
   "docker.mirrors.customTitle": "Aggiungi mirror personalizzato",
-  "docker.mirrors.saved": "Mirror del registro salvati con successo."
+  "docker.mirrors.saved": "Mirror del registro salvati con successo.",
+  "settings.sections.autoheal": "Auto-ripristino e interruttore (Auto-Healing)",
+  "settings.items.docker.autoheal.enabled.label": "Abilita auto-ripristino",
+  "settings.items.docker.autoheal.enabled.help": "Riavvia automaticamente i container in caso di crash imprevisti o OOM.",
+  "settings.items.docker.autoheal.max_retries.label": "Tentativi massimi",
+  "settings.items.docker.autoheal.max_retries.help": "Numero massimo di tentativi prima dell'attivazione dell'interruttore.",
+  "settings.items.docker.autoheal.window_minutes.label": "Finestra temporale (minuti)",
+  "settings.items.docker.autoheal.window_minutes.help": "Finestra di tempo per valutare i crash consecutivi.",
+  "settings.sections.webhookDeploy": "Trigger di distribuzione Webhook (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "Abilita trigger Webhook",
+  "settings.items.docker.webhook_deploy.enabled.help": "Consente a pipeline CI/CD esterne di attivare gli aggiornamenti.",
+  "settings.items.docker.webhook_deploy.token.label": "Token segreto di distribuzione",
+  "settings.items.docker.webhook_deploy.token.help": "Token segreto atteso nell'intestazione X-Deploy-Token."
 }

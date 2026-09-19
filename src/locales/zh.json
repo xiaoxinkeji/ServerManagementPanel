@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "预置主流镜像加速源",
   "docker.mirrors.testLatency": "测速与连通性检查",
   "docker.mirrors.customTitle": "添加自定义加速源",
-  "docker.mirrors.saved": "镜像加速源配置已保存并生效。"
+  "docker.mirrors.saved": "镜像加速源配置已保存并生效。",
+  "settings.sections.autoheal": "智能故障自愈 (Auto-Healing)",
+  "settings.items.docker.autoheal.enabled.label": "启用故障自愈",
+  "settings.items.docker.autoheal.enabled.help": "当监测到容器因 OOM 内存溢出或非正常退出（非0退出码）时，自动尝试重新拉起容器。",
+  "settings.items.docker.autoheal.max_retries.label": "最大自愈重试次数",
+  "settings.items.docker.autoheal.max_retries.help": "在时间窗口内允许的最大自动拉起次数。超过该阈值将自动触发熔断保护，停止重启并发出严重报警，防止死循环抢占 CPU。",
+  "settings.items.docker.autoheal.window_minutes.label": "统计时间窗口 (分钟)",
+  "settings.items.docker.autoheal.window_minutes.help": "计算连续崩溃频次的滑动窗口时长。",
+  "settings.sections.webhookDeploy": "外部 Webhook 触发部署 (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "启用 Webhook 部署触发器",
+  "settings.items.docker.webhook_deploy.enabled.help": "允许外部持续集成服务 (GitHub Actions/GitLab CI) 调用 /api/v1/webhooks/deploy 自动化拉取最新镜像并重启指定容器。",
+  "settings.items.docker.webhook_deploy.token.label": "Webhook 部署鉴权 Token",
+  "settings.items.docker.webhook_deploy.token.help": "外部请求时需在 X-Deploy-Token 请求头中提供该私密 Token 进行验签。"
 }

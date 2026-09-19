@@ -3778,5 +3778,17 @@
   "docker.mirrors.presetTitle": "Preset Registry Mirrors",
   "docker.mirrors.testLatency": "Test latency and connection",
   "docker.mirrors.customTitle": "Add Custom Mirror",
-  "docker.mirrors.saved": "Registry mirrors saved successfully."
+  "docker.mirrors.saved": "Registry mirrors saved successfully.",
+  "settings.sections.autoheal": "Auto-Healing & Circuit Breaker",
+  "settings.items.docker.autoheal.enabled.label": "Enable Auto-Healing",
+  "settings.items.docker.autoheal.enabled.help": "Automatically attempts to restart containers when unexpected exits or OOM crashes occur.",
+  "settings.items.docker.autoheal.max_retries.label": "Maximum auto-healing retries",
+  "settings.items.docker.autoheal.max_retries.help": "Maximum allowed restart attempts within the time window before circuit breaker trips.",
+  "settings.items.docker.autoheal.window_minutes.label": "Evaluation window (minutes)",
+  "settings.items.docker.autoheal.window_minutes.help": "Time window for evaluating consecutive container crashes.",
+  "settings.sections.webhookDeploy": "Webhook Deploy Trigger (CI/CD)",
+  "settings.items.docker.webhook_deploy.enabled.label": "Enable Webhook Deploy Trigger",
+  "settings.items.docker.webhook_deploy.enabled.help": "Allows external CI/CD workflows to trigger container updates via /api/v1/webhooks/deploy.",
+  "settings.items.docker.webhook_deploy.token.label": "Deploy Secret Token",
+  "settings.items.docker.webhook_deploy.token.help": "Secret token expected in the X-Deploy-Token request header for authentication."
 }
