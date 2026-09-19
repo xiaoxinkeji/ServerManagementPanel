@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Sparkles, Brain, ShieldCheck, Terminal, Cpu } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Sparkles, Brain, ShieldCheck, Terminal, Cpu, History, Activity } from "lucide-react";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 
 function readCsrfToken(): string {
@@ -9,52 +9,93 @@ function readCsrfToken(): string {
   return match ? decodeURIComponent(match[1]) : "";
 }
 
+type DiagnosisRecord = {
+  id: number;
+  ts: number;
+  containerName: string;
+  trigger: "manual" | "autoheal";
+  category: string;
+  confidence: number;
+  isFatal: boolean;
+};
+
+type Stats = { total: number; fatal: number; byCategory: Record<string, number> };
+
+type DiagnosisResult = {
+  category: string;
+  category_label: string;
+  is_fatal: boolean;
+  can_autoheal: boolean;
+  confidence: number;
+  summary: string;
+  recommendation: string;
+  source: string;
+  latency_ms: number;
+  evidence?: string[];
+};
+
+type DecisionResult = {
+  answer: string | number | boolean;
+  confidence: number;
+  reasoning?: string;
+  engine: string;
+  latency_ms: number;
+  evidence?: string[];
+  distribution?: Record<string, number>;
+};
+
 export default function AiScreen() {
   const [config, setConfig] = useState<{ mode: string; endpoint: string; model: string } | null>(null);
   const [containers, setContainers] = useState<Array<{ id: string; name: string; status: string }>>([]);
-  
+  const [history, setHistory] = useState<DiagnosisRecord[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+
   // 自定义决策测试
   const [context, setContext] = useState("nginx: [emerg] open() '/etc/nginx/nginx.conf' failed (2: No such file or directory)");
   const [question, setQuestion] = useState("What is the primary cause of error?");
+  const [requestType, setRequestType] = useState<"choice" | "score" | "boolean">("choice");
   const [options, setOptions] = useState("config_syntax_error, oom_killed, network_timeout, permission_denied");
   const [running, setRunning] = useState(false);
-  const [decisionResult, setDecisionResult] = useState<{
-    answer: string | number | boolean;
-    confidence: number;
-    reasoning?: string;
-    engine: string;
-    latency_ms: number;
-  } | null>(null);
+  const [decisionResult, setDecisionResult] = useState<DecisionResult | null>(null);
 
-  useEffect(() => {
+  // 一键容器诊断
+  const [selectedContainer, setSelectedContainer] = useState("");
+  const [diagnosing, setDiagnosing] = useState(false);
+  const [diagResult, setDiagResult] = useState<{ container?: { name: string; status: string }; diagnosis: DiagnosisResult } | null>(null);
+
+  const loadData = useCallback(() => {
     fetch("/api/ai")
       .then((r) => r.json())
       .then((data) => {
         setConfig(data.config);
         setContainers(data.containers || []);
+        setHistory(data.history || []);
+        setStats(data.stats || null);
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleAsk = async () => {
     setRunning(true);
     try {
       const opts = options.split(",").map((s) => s.trim()).filter(Boolean);
+      const request =
+        requestType === "choice"
+          ? { type: "choice", context, question, options: opts }
+          : requestType === "score"
+            ? { type: "score", context, question, min: 0, max: 10 }
+            : { type: "boolean", context, question };
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           [CSRF_HEADER]: readCsrfToken(),
         },
-        body: JSON.stringify({
-          action: "ask",
-          request: {
-            type: "choice",
-            context,
-            question,
-            options: opts,
-          },
-        }),
+        body: JSON.stringify({ action: "ask", request }),
       });
       if (res.ok) {
         const json = await res.json();
@@ -66,6 +107,38 @@ export default function AiScreen() {
       setRunning(false);
     }
   };
+
+  const handleDiagnose = async () => {
+    if (!selectedContainer) return;
+    setDiagnosing(true);
+    setDiagResult(null);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: readCsrfToken(),
+        },
+        body: JSON.stringify({ action: "diagnose", containerId: selectedContainer }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setDiagResult(json);
+        loadData(); // 刷新诊断历史
+      } else {
+        alert(json.error || "Diagnosis failed");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setDiagnosing(false);
+    }
+  };
+
+  const lastLatency = diagResult?.diagnosis.latency_ms ?? decisionResult?.latency_ms;
+  const topCategory = stats && Object.keys(stats.byCategory).length > 0
+    ? Object.entries(stats.byCategory).sort((a, b) => b[1] - a[1])[0][0]
+    : "—";
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -92,7 +165,7 @@ export default function AiScreen() {
                 {config?.mode === "builtin" ? "内置本地内核 (Built-in)" : config?.mode === "remote" ? "远程云端 API" : "禁用"}
               </span>
             </div>
-            <span className="text-[11px] text-subtle">推理延迟: ~2ms</span>
+            <span className="text-[11px] text-subtle">推理延迟: {lastLatency != null ? `~${lastLatency}ms` : "—"}</span>
             <span className="text-[11px] text-subtle">模型: {config?.model || "jev-1"}</span>
           </div>
         </div>
@@ -128,6 +201,143 @@ export default function AiScreen() {
           <p className="mt-1 text-xs text-subtle leading-relaxed">
             实时容器日志查看器内置 Jev 诊断探针，一键提取异常堆栈，输出置信度百分比与精准治理建议。
           </p>
+        </div>
+      </div>
+
+      {/* 一键容器 Jev 诊断 */}
+      <div className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md">
+        <div className="flex items-center justify-between border-b border-line/40 pb-4">
+          <div className="flex items-center gap-2">
+            <Activity className="size-5 text-brand" />
+            <h2 className="font-semibold text-ink text-base">容器一键诊断 (Container Quick Diagnose)</h2>
+          </div>
+          <span className="text-xs text-subtle">读取容器近期 100 行日志并输出故障分类报告</span>
+        </div>
+
+        <div className="mt-5 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={selectedContainer}
+              onChange={(e) => setSelectedContainer(e.target.value)}
+              className="min-w-56 rounded-xl border border-line bg-canvas/60 p-2.5 text-xs text-ink focus:border-brand focus:outline-none"
+            >
+              <option value="">选择目标容器...</option>
+              {containers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.status})
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={diagnosing || !selectedContainer}
+              onClick={handleDiagnose}
+              className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand/90 active:scale-95 disabled:opacity-50"
+            >
+              <Sparkles className="size-3.5" />
+              <span>{diagnosing ? "Jev 诊断中..." : "一键 Jev 诊断"}</span>
+            </button>
+          </div>
+
+          {diagResult && (
+            <div className="rounded-xl border border-brand/30 bg-brand/5 p-4">
+              <div className="flex items-center justify-between border-b border-brand/20 pb-2">
+                <span className="font-semibold text-brand text-xs">
+                  {diagResult.container?.name} 诊断报告
+                </span>
+                <span className="text-[11px] text-subtle font-mono">
+                  耗时: {diagResult.diagnosis.latency_ms}ms · 引擎: {diagResult.diagnosis.source}
+                </span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-base font-bold text-ink">{diagResult.diagnosis.category_label}</span>
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">
+                  置信度: {Math.round(diagResult.diagnosis.confidence * 100)}%
+                </span>
+                {diagResult.diagnosis.is_fatal && (
+                  <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-semibold text-danger">致命故障</span>
+                )}
+                {diagResult.diagnosis.can_autoheal && (
+                  <span className="rounded-full bg-ok/10 px-2.5 py-0.5 text-xs font-semibold text-ok">可自愈</span>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-subtle leading-relaxed">{diagResult.diagnosis.summary}</p>
+              <p className="mt-1 text-xs text-subtle leading-relaxed">
+                <span className="font-medium text-ink">修复建议：</span>
+                {diagResult.diagnosis.recommendation}
+              </p>
+              {diagResult.diagnosis.evidence && diagResult.diagnosis.evidence.length > 0 && (
+                <div className="mt-2">
+                  <span className="text-xs font-medium text-ink">关键证据行：</span>
+                  <ul className="mt-1 space-y-0.5 font-mono text-[11px] text-subtle">
+                    {diagResult.diagnosis.evidence.map((line, i) => (
+                      <li key={i} className="truncate">{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 近期诊断历史 */}
+      <div className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md">
+        <div className="flex items-center justify-between border-b border-line/40 pb-4">
+          <div className="flex items-center gap-2">
+            <History className="size-5 text-brand" />
+            <h2 className="font-semibold text-ink text-base">近期诊断历史</h2>
+          </div>
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="rounded-full bg-brand/10 px-2.5 py-0.5 font-semibold text-brand">
+              7 天诊断次数: {stats?.total ?? 0}
+            </span>
+            <span className="rounded-full bg-danger/10 px-2.5 py-0.5 font-semibold text-danger">
+              致命故障数: {stats?.fatal ?? 0}
+            </span>
+            <span className="rounded-full bg-warn/10 px-2.5 py-0.5 font-semibold text-warn">
+              Top 类别: {topCategory}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 overflow-x-auto">
+          {history.length === 0 ? (
+            <p className="py-4 text-center text-xs text-subtle">暂无诊断记录，执行一次一键诊断后将在此展示。</p>
+          ) : (
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-line/40 text-subtle">
+                  <th className="py-2 pr-3 font-medium">时间</th>
+                  <th className="py-2 pr-3 font-medium">容器</th>
+                  <th className="py-2 pr-3 font-medium">触发</th>
+                  <th className="py-2 pr-3 font-medium">类别</th>
+                  <th className="py-2 pr-3 font-medium">置信度</th>
+                  <th className="py-2 font-medium">严重性</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((h) => (
+                  <tr key={h.id} className="border-b border-line/20 last:border-0">
+                    <td className="py-2 pr-3 font-mono text-subtle whitespace-nowrap">
+                      {new Date(h.ts * 1000).toLocaleString()}
+                    </td>
+                    <td className="py-2 pr-3 font-mono text-ink">{h.containerName}</td>
+                    <td className="py-2 pr-3 text-subtle">{h.trigger === "autoheal" ? "自愈" : "手动"}</td>
+                    <td className="py-2 pr-3 font-mono text-ink">{h.category}</td>
+                    <td className="py-2 pr-3 text-subtle">{Math.round(h.confidence * 100)}%</td>
+                    <td className="py-2">
+                      {h.isFatal ? (
+                        <span className="rounded bg-danger/10 px-1.5 py-0.5 text-[10px] font-semibold text-danger">致命</span>
+                      ) : (
+                        <span className="text-subtle">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -185,6 +395,21 @@ export default function AiScreen() {
               />
             </div>
             <div>
+              <label className="block text-xs font-medium text-subtle mb-1.5">判定模式 (Request Type)</label>
+              <select
+                value={requestType}
+                onChange={(e) => setRequestType(e.target.value as "choice" | "score" | "boolean")}
+                className="w-full rounded-xl border border-line bg-canvas/60 p-2.5 text-xs text-ink focus:border-brand focus:outline-none"
+              >
+                <option value="choice">choice (选项分类)</option>
+                <option value="score">score (严重度评分 0-10)</option>
+                <option value="boolean">boolean (是/否判定)</option>
+              </select>
+            </div>
+          </div>
+
+          {requestType === "choice" && (
+            <div>
               <label className="block text-xs font-medium text-subtle mb-1.5">候选选项集 (Options, 逗号分隔)</label>
               <input
                 type="text"
@@ -193,7 +418,7 @@ export default function AiScreen() {
                 className="w-full rounded-xl border border-line bg-canvas/60 p-2.5 font-mono text-xs text-ink focus:border-brand focus:outline-none"
               />
             </div>
-          </div>
+          )}
 
           <div className="flex justify-end pt-2">
             <button
@@ -223,6 +448,36 @@ export default function AiScreen() {
               </div>
               {decisionResult.reasoning && (
                 <p className="mt-2 text-xs text-subtle leading-relaxed">{decisionResult.reasoning}</p>
+              )}
+              {decisionResult.distribution && Object.keys(decisionResult.distribution).length > 0 && (
+                <div className="mt-3 space-y-1.5">
+                  {Object.entries(decisionResult.distribution)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([opt, p]) => (
+                      <div key={opt} className="flex items-center gap-2">
+                        <span className="w-40 truncate font-mono text-[11px] text-subtle">{opt}</span>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-line/40">
+                          <div
+                            className="h-full rounded-full bg-brand/70"
+                            style={{ width: `${Math.min(100, Math.round(p * 100))}%` }}
+                          />
+                        </div>
+                        <span className="w-10 text-right font-mono text-[11px] text-ink">
+                          {Math.round(p * 100)}%
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
+              {decisionResult.evidence && decisionResult.evidence.length > 0 && (
+                <div className="mt-3">
+                  <span className="text-xs font-medium text-ink">关键证据行：</span>
+                  <ul className="mt-1 space-y-0.5 font-mono text-[11px] text-subtle">
+                    {decisionResult.evidence.map((line, i) => (
+                      <li key={i} className="truncate">{line}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
           )}
