@@ -359,6 +359,11 @@ export interface DockerProvider {
   removeResource(kind: ResourceKind, id: string, force: boolean): Promise<void>;
   /** Restart politikası recreate gerektirmeden değişir (Docker `/update`). */
   setRestartPolicy(id: string, policy: RestartPolicy): Promise<void>;
+  /** 动态更新容器资源配额（CPU / 内存限制），无需停机重启 (Docker `/update`). */
+  updateResources(
+    id: string,
+    limits: { nanoCpus?: number; memoryBytes?: number; memoryReservationBytes?: number },
+  ): Promise<void>;
 
   // --- M1.11 (tek-tık image güncellemesi) ---
   /** Image'ı kayıt defterinden çeker; ilerleme satırları akış olarak gelir. */

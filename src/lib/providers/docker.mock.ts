@@ -192,6 +192,11 @@ export const mockDockerProvider: DockerProvider = {
     restartPolicyOverrides.set(id, policy);
   },
 
+  async updateResources(id, limits): Promise<void> {
+    void id;
+    void limits;
+  },
+
   // --- M1.11 ---
   // Bu işlemler gerçek Docker olmadan taklit edilmiyor: "güncelledim" deyip
   // hiçbir şey yapmayan bir sahte, geliştirirken yanlış güven verirdi. API

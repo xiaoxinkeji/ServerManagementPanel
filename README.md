@@ -45,13 +45,17 @@ Designed at home-server (homelab) scale: a single container, embedded SQLite, no
 - **Monitoring:** CPU, memory, disk, network, and temperature history. Metrics are stored in tiers: raw data for 24 hours, 1-minute resolution for 7 days, 1-hour resolution for 90 days, 1-day resolution for 24 months. Retention periods can be changed from settings. Capacity forecasting is done for disk, RAM, and CPU ("disk may fill up in 12 days").
 - **Hardware health:** sensor temperatures, mdraid, S.M.A.R.T, and ZFS pool status. On a virtual machine the panel doesn't show an empty box — it states the reason.
 - **Service Status:** HTTP, TCP, ping, DNS, and container probes. Includes a 60-day uptime strip and maintenance windows.
-- **Events and notifications:** Telegram, Home Assistant, ntfy, Discord, and email channels, each with its own severity filter. Flap protection, repeat suppression, quiet hours, and re-reminders for unresolved critical alerts are applied to prevent a storm of false alarms. The **Timeline** merges the audit log, events, and metric spikes into a single feed ("this setting changed at 22:00, this container crashed at 22:05").
+- **Events and notifications:** Generic Webhook (DingTalk / WeChat Work / Feishu compatible), Bark (iOS push), ServerChan (WeChat), PushPlus, Telegram, Home Assistant, ntfy, Discord, and email channels, each with its own severity filter. Flap protection, repeat suppression, quiet hours, and re-reminders for unresolved critical alerts are applied to prevent a storm of false alarms. The **Timeline** merges the audit log, events, and metric spikes into a single feed ("this setting changed at 22:00, this container crashed at 22:05").
 - **Logs:** container logs and journald are collected in one place and searched with SQLite FTS5. Accent-insensitive: typing "olcum" finds "ölçüm". Alert rules can be defined based on log patterns.
 
 ### Management
 
 - **Docker:** Container, Stack, Image, Volume, Network, and Cleanup tabs.
   - Start, stop, restart, delete, and bulk-operate on containers.
+  - **Dynamic Resource Quotas:** update CPU and memory limits on running containers on the fly via Docker update API without restarting.
+  - **Docker Registry Mirrors:** manage and test latency of preset mirrors (e.g. 163, USTC, NJU) and automatically apply to `/etc/docker/daemon.json`.
+  - **Log Truncation:** safely truncate container log files (`truncate -s 0`) without dropping stdout streams to reclaim disk space.
+  - **Mobile Touch Bar in Web Terminal:** touch-friendly functional keys (Esc, Tab, Ctrl+C, Ctrl+L, Arrow keys) and zoomable font controls.
   - Live logs (with ANSI colors), an in-container web terminal (xterm.js), an in-container file browser and editor, and per-container resource graphs.
   - **Add container:** create a container by pre-filling a form from a compose file or a pulled image, then editing it.
   - **Compose editor:** ports, networks, environment variables, and restart policy are edited via a form. Before saving, a line-by-line diff is shown, a backup is taken, and it rolls back automatically on failure.

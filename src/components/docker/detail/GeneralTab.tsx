@@ -113,6 +113,11 @@ export function GeneralTab({
         canAct={canAct}
       />
 
+      <ResourceQuotaSection
+        containerId={containerId}
+        canAct={canAct}
+      />
+
       <Section title={t("docker.general.mounts")}>
         {detail.mounts.length === 0 ? (
           <p className="text-sm text-subtle">{t("docker.general.noMounts")}</p>
@@ -299,6 +304,99 @@ function RestartPolicySection({
             />
           </>
         )}
+      </p>
+    </Section>
+  );
+}
+
+function ResourceQuotaSection({
+  containerId,
+  canAct,
+}: {
+  containerId: string;
+  canAct: boolean;
+}) {
+  const t = useT();
+  const [cpu, setCpu] = useState<string>("");
+  const [mem, setMem] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  async function save() {
+    setBusy(true);
+    setError(null);
+    setSaved(false);
+    try {
+      const body: Record<string, number | undefined> = {};
+      if (cpu.trim()) body.cpu = Number(cpu);
+      if (mem.trim()) body.memoryMb = Number(mem);
+
+      const response = await fetch(
+        `/api/docker/${encodeURIComponent(containerId)}/resources`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json", [CSRF_HEADER]: readCsrfToken() },
+          body: JSON.stringify(body),
+        },
+      );
+      const payload = await response.json();
+      if (!response.ok) setError(payload.error ?? t("docker.resources.updateFailed"));
+      else setSaved(true);
+    } catch {
+      setError(t("common.errors.network"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Section title={t("docker.resources.quotaTitle")}>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-1.5 text-xs text-subtle">
+          {t("docker.resources.cpuLimit")}:
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            max="128"
+            placeholder={t("docker.resources.unlimited")}
+            value={cpu}
+            onChange={(e) => setCpu(e.target.value)}
+            disabled={!canAct || busy}
+            className="w-24 rounded-md border border-line bg-canvas px-2.5 py-1 text-sm outline-none focus:border-brand"
+          />
+        </label>
+
+        <label className="flex items-center gap-1.5 text-xs text-subtle">
+          {t("docker.resources.memLimit")}:
+          <input
+            type="number"
+            min="0"
+            placeholder={t("docker.resources.unlimited")}
+            value={mem}
+            onChange={(e) => setMem(e.target.value)}
+            disabled={!canAct || busy}
+            className="w-28 rounded-md border border-line bg-canvas px-2.5 py-1 text-sm outline-none focus:border-brand"
+          />
+          MB
+        </label>
+
+        <button
+          type="button"
+          disabled={!canAct || busy}
+          onClick={() => void save()}
+          className="rounded-md border border-line/80 bg-brand/10 px-3 py-1 text-xs font-medium text-brand transition-colors hover:bg-brand/20 disabled:opacity-50"
+        >
+          {t("docker.resources.apply")}
+        </button>
+
+        {saved && <span className="text-xs text-ok">{t("docker.general.applied")}</span>}
+      </div>
+
+      {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
+      <p className="mt-2 text-xs text-subtle">
+        {t("docker.resources.quotaHelp")}
       </p>
     </Section>
   );

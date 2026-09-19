@@ -172,6 +172,7 @@ export function ContainerDrawer({
               containerId={container.id}
               containerName={container.name}
               tail={logTail}
+              canAct={canAct}
             />
           )}
 

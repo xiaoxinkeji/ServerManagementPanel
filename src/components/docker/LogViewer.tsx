@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Minus, Pause, Play, Plus, Search } from "lucide-react";
+import { Download, Minus, Pause, Play, Plus, Search, Trash2 } from "lucide-react";
 
 import { parseAnsi, stripAnsi, type AnsiSpan } from "@/lib/logs/ansi";
 import { fold } from "@/lib/text";
 import { useFormat, useT } from "@/lib/i18n/client";
+import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 
 /**
  * Canlı container logu (M1.7).
@@ -96,10 +97,12 @@ export function LogViewer({
   containerId,
   containerName,
   tail,
+  canAct = false,
 }: {
   containerId: string;
   containerName: string;
   tail: number;
+  canAct?: boolean;
 }) {
   const t = useT();
   const f = useFormat();
@@ -180,6 +183,31 @@ export function LogViewer({
    * bir hata raporunda açan kişi renk kodlarını değil metni görmeli. Arama
    * süzgeci uygulanmış hâli iniyor — kullanıcı ekranda ne görüyorsa o.
    */
+  const [truncating, setTruncating] = useState(false);
+
+  async function truncateLog() {
+    if (!window.confirm(t("docker.logs.truncateConfirm"))) return;
+    setTruncating(true);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch(`/api/docker/${encodeURIComponent(containerId)}/logs/truncate`, {
+        method: "POST",
+        headers: { [CSRF_HEADER]: csrf },
+      });
+      if (res.ok) {
+        setLines([]);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Truncate failed");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setTruncating(false);
+    }
+  }
+
   function download() {
     const text = filtered
       .map((line) => {
@@ -251,6 +279,16 @@ export function LogViewer({
           <IconOnly title={t("docker.logs.download")} onClick={download}>
             <Download className="size-3.5" />
           </IconOnly>
+
+          {canAct && (
+            <IconOnly
+              title={t("docker.logs.truncate")}
+              disabled={truncating}
+              onClick={() => void truncateLog()}
+            >
+              <Trash2 className="size-3.5 text-danger/80 hover:text-danger" />
+            </IconOnly>
+          )}
         </div>
       </div>
 

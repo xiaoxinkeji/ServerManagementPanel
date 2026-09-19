@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Plus } from "lucide-react";
+import { AlertTriangle, Globe, Plus } from "lucide-react";
+import { MirrorsModal } from "@/components/docker/MirrorsModal";
 import { ContainerDrawer, type DrawerTab } from "@/components/docker/ContainerDrawer";
 import { ContainerCreateDialog } from "@/components/docker/ContainerCreateDialog";
 import { PrunePanel } from "@/components/docker/PrunePanel";
@@ -178,6 +179,7 @@ export function DockerScreen({
     değiştirmek zorunda kalıyordu.
   */
   const [agGorunumu, setAgGorunumu] = useState<"harita" | "liste">("liste");
+  const [mirrorsOpen, setMirrorsOpen] = useState(false);
 
   /*
     Satırın geri çağrıları tek nesnede: `ContainerRow` hem burada hem Stack
@@ -498,14 +500,24 @@ export function DockerScreen({
                 onu listeden çıkmadan bulamaması demekti.
               */}
               {canAct && (
-                <button
-                  type="button"
-                  onClick={() => setEkleAcik(true)}
-                  className="inline-flex items-center gap-1 rounded-md border border-brand bg-brand/10 px-2 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand/20"
-                >
-                  <Plus className="size-3.5" aria-hidden />
-                  {t("docker.screen.addContainer")}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setEkleAcik(true)}
+                    className="inline-flex items-center gap-1 rounded-md border border-brand bg-brand/10 px-2.5 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand/20"
+                  >
+                    <Plus className="size-3.5" aria-hidden />
+                    {t("docker.screen.addContainer")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMirrorsOpen(true)}
+                    className="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs font-medium text-subtle transition-colors hover:border-brand hover:text-brand"
+                  >
+                    <Globe className="size-3.5" aria-hidden />
+                    {t("docker.mirrors.btn")}
+                  </button>
+                </>
               )}
               <label className="flex items-center gap-1.5 text-xs text-subtle">
                 <input
@@ -747,6 +759,12 @@ export function DockerScreen({
           }}
         />
       )}
+
+      <MirrorsModal
+        open={mirrorsOpen}
+        onClose={() => setMirrorsOpen(false)}
+        canAct={canAct}
+      />
 
       {/*
         `key`: çekmece kapanmadan başka bir container'a geçilirse (ör. arama

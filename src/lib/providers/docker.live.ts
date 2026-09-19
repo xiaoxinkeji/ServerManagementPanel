@@ -403,6 +403,32 @@ export const liveDockerProvider: DockerProvider = {
     if (payload.Warnings?.length) throw new Error(payload.Warnings.join(" · "));
   },
 
+  async updateResources(id, limits): Promise<void> {
+    const updatePayload: Record<string, unknown> = {};
+    if (typeof limits.nanoCpus === "number" && limits.nanoCpus >= 0) {
+      updatePayload.NanoCPUs = limits.nanoCpus;
+    }
+    if (typeof limits.memoryBytes === "number" && limits.memoryBytes >= 0) {
+      updatePayload.Memory = limits.memoryBytes;
+      // 设置 MemorySwap 为 -1（或等于 Memory * 2），避免 Docker 报错 "Memory limit should be smaller than already set memoryswap limit"
+      updatePayload.MemorySwap = limits.memoryBytes * 2;
+    }
+    if (typeof limits.memoryReservationBytes === "number" && limits.memoryReservationBytes >= 0) {
+      updatePayload.MemoryReservation = limits.memoryReservationBytes;
+    }
+
+    const response = await request(
+      `/containers/${encodeURIComponent(id)}/update`,
+      10_000,
+      "POST",
+      updatePayload,
+    );
+
+    if (response.status !== 200) throw dockerError(response);
+    const payload = JSON.parse(response.body) as { Warnings?: string[] };
+    if (payload.Warnings?.length) throw new Error(payload.Warnings.join(" · "));
+  },
+
   // --- M1.11 ---
 
   async *pullImage(reference: string): AsyncGenerator<string> {

@@ -328,10 +328,12 @@ const TOUCH_KEYS: { label: string; sequence: string }[] = [
   { label: "Tab", sequence: "\t" },
   { label: "Ctrl+C", sequence: "\x03" },
   { label: "Ctrl+D", sequence: "\x04" },
+  { label: "Ctrl+L", sequence: "\x0c" }, // 清屏
   { label: "↑", sequence: "\x1b[A" },
   { label: "↓", sequence: "\x1b[B" },
   { label: "←", sequence: "\x1b[D" },
   { label: "→", sequence: "\x1b[C" },
+  { label: "Enter", sequence: "\r" },
 ];
 
 function FontButton({
