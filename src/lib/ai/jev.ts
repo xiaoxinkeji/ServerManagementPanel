@@ -1,4 +1,4 @@
-import { getString } from "@/lib/settings";
+// Jev System One Decision Engine & Kernel
 
 export interface JevDecisionChoiceRequest {
   type: "choice";
@@ -60,22 +60,22 @@ function runBuiltinJevDecision(
 
     // 训练提炼出的典型故障先验权重矩阵 (Priors)
     if (text.includes("oom") || text.includes("out of memory") || text.includes("kill") || text.includes("exitcode: 137")) {
-      scores.set("oom_killed", (scores.get("oom_killed") || 0) + 0.92);
+      scores.set("oom_killed", (scores.get("oom_killed") || 0) + 4.5);
     }
     if (text.includes("econnrefused") || text.includes("etimedout") || text.includes("connection refused") || text.includes("connect econnrefused") || text.includes("network is unreachable")) {
-      scores.set("network_timeout", (scores.get("network_timeout") || 0) + 0.89);
+      scores.set("network_timeout", (scores.get("network_timeout") || 0) + 4.2);
     }
     if (text.includes("syntaxerror") || text.includes("invalid config") || text.includes("unexpected token") || text.includes("unknown flag") || text.includes("yaml:") || text.includes("json:")) {
-      scores.set("config_syntax_error", (scores.get("config_syntax_error") || 0) + 0.91);
+      scores.set("config_syntax_error", (scores.get("config_syntax_error") || 0) + 4.2);
     }
     if (text.includes("eacces") || text.includes("permission denied") || text.includes("operation not permitted") || text.includes("forbidden")) {
-      scores.set("permission_denied", (scores.get("permission_denied") || 0) + 0.94);
+      scores.set("permission_denied", (scores.get("permission_denied") || 0) + 4.2);
     }
     if (text.includes("sql") || text.includes("mysql") || text.includes("postgres") || text.includes("redis") || text.includes("database") || text.includes("prisma") || text.includes("dial tcp")) {
-      scores.set("database_error", (scores.get("database_error") || 0) + 0.85);
+      scores.set("database_error", (scores.get("database_error") || 0) + 4.0);
     }
     if (text.includes("exitcode: 0") || text.includes("listening on") || text.includes("ready on") || text.includes("started server") || text.includes("server running")) {
-      scores.set("normal_operation", (scores.get("normal_operation") || 0) + 0.78);
+      scores.set("normal_operation", (scores.get("normal_operation") || 0) + 3.8);
     }
 
     // 计算 Softmax / 最大后验概率
@@ -157,13 +157,22 @@ async function callRemoteJev(
   }
 }
 
+function getSettingSafe(key: string, fallback: string): string {
+  try {
+    const { getString } = require("@/lib/settings");
+    return getString(key) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 /**
  * Jev 决策分发（默认 builtin 开箱即用，支持 remote）
  */
 export async function askJev(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
 ): Promise<JevDecisionResponse> {
-  const mode = getString("ai.jev.mode") || "builtin";
+  const mode = getSettingSafe("ai.jev.mode", "builtin");
 
   if (mode === "disabled") {
     // 禁用时降级到基础启发
@@ -176,9 +185,9 @@ export async function askJev(
   }
 
   if (mode === "remote") {
-    const endpoint = getString("ai.jev.endpoint");
-    const apiKey = getString("ai.jev.api_key");
-    const model = getString("ai.jev.model") || "jev-1";
+    const endpoint = getSettingSafe("ai.jev.endpoint", "");
+    const apiKey = getSettingSafe("ai.jev.api_key", "");
+    const model = getSettingSafe("ai.jev.model", "jev-1");
 
     if (endpoint && apiKey) {
       const remoteRes = await callRemoteJev(request, endpoint, apiKey, model);
