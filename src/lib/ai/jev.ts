@@ -53,7 +53,10 @@ export function runBuiltinJevDecision(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
 ): JevDecisionResponse {
   const start = Date.now();
-  const text = (request.context + " " + request.question).toLowerCase();
+  // 只分析上下文内容与用户问题意图，不要把 question 里的元单词混进故障特征
+  const ctx = request.context.toLowerCase();
+  const q = request.question.toLowerCase();
+  const fullText = (ctx + " " + q);
 
   // 1. Choice 模式决策
   if (request.type === "choice") {
@@ -62,24 +65,36 @@ export function runBuiltinJevDecision(
       scores.set(opt, 0.05); // 基础平滑概率
     }
 
-    // 训练提炼出的典型故障先验权重矩阵 (Priors)
-    if (text.includes("oom") || text.includes("out of memory") || text.includes("kill") || text.includes("exitcode: 137")) {
-      scores.set("oom_killed", (scores.get("oom_killed") || 0) + 4.5);
-    }
-    if (text.includes("econnrefused") || text.includes("etimedout") || text.includes("connection refused") || text.includes("connect econnrefused") || text.includes("network is unreachable")) {
-      scores.set("network_timeout", (scores.get("network_timeout") || 0) + 4.2);
-    }
-    if (text.includes("syntaxerror") || text.includes("invalid config") || text.includes("unexpected token") || text.includes("unknown flag") || text.includes("yaml:") || text.includes("json:")) {
-      scores.set("config_syntax_error", (scores.get("config_syntax_error") || 0) + 4.2);
-    }
-    if (text.includes("eacces") || text.includes("permission denied") || text.includes("operation not permitted") || text.includes("forbidden")) {
-      scores.set("permission_denied", (scores.get("permission_denied") || 0) + 4.2);
-    }
-    if (text.includes("sql") || text.includes("mysql") || text.includes("postgres") || text.includes("redis") || text.includes("database") || text.includes("prisma") || text.includes("dial tcp")) {
-      scores.set("database_error", (scores.get("database_error") || 0) + 4.0);
-    }
-    if (text.includes("exitcode: 0") || text.includes("listening on") || text.includes("ready on") || text.includes("started server") || text.includes("server running")) {
-      scores.set("normal_operation", (scores.get("normal_operation") || 0) + 3.8);
+    // A. 错误信号检测（仅基于 Context 日志本身，避免 Question 包含 error 导致误伤）
+    const hasLogFatal = ctx.includes("fatal") || ctx.includes("panic") || ctx.includes("syntaxerror") || ctx.includes("out of memory");
+    const hasLogError = ctx.includes("error") || ctx.includes("failed") || ctx.includes("refused") || ctx.includes("crash");
+    const isExplicitExited = ctx.includes("exitcode: 137") || ctx.includes("exitcode: 1") || ctx.includes("killed") || ctx.includes("status: exited");
+
+    // B. 健康信号检测
+    const hasHealthySignal = ctx.includes("healthy") || ctx.includes("status: up") || ctx.includes("listening on") || ctx.includes("ready on") || ctx.includes("exitcode: 0") || ctx.includes("normal operational");
+
+    if (scores.has("normal_operation") && hasHealthySignal && !hasLogFatal && !isExplicitExited) {
+      scores.set("normal_operation", 5.0);
+    } else {
+      // 故障特征先验匹配
+      if (ctx.includes("oom") || ctx.includes("out of memory") || ctx.includes("killed") || ctx.includes("exitcode: 137")) {
+        scores.set("oom_killed", (scores.get("oom_killed") || 0) + 4.5);
+      }
+      if (ctx.includes("econnrefused") || ctx.includes("etimedout") || ctx.includes("connection refused") || ctx.includes("network is unreachable")) {
+        scores.set("network_timeout", (scores.get("network_timeout") || 0) + 4.2);
+      }
+      if (ctx.includes("syntaxerror") || ctx.includes("invalid config") || ctx.includes("unexpected token") || ctx.includes("parse error")) {
+        scores.set("config_syntax_error", (scores.get("config_syntax_error") || 0) + 4.2);
+      }
+      if (ctx.includes("eacces") || ctx.includes("permission denied") || ctx.includes("operation not permitted")) {
+        scores.set("permission_denied", (scores.get("permission_denied") || 0) + 4.2);
+      }
+      if ((hasLogError || hasLogFatal) && (ctx.includes("sql") || ctx.includes("mysql") || ctx.includes("postgres") || ctx.includes("redis") || ctx.includes("database") || ctx.includes("prisma"))) {
+        scores.set("database_error", (scores.get("database_error") || 0) + 4.0);
+      }
+      if (scores.has("unhealthy") && (ctx.includes("unhealthy") || ctx.includes("exited") || ctx.includes("dead"))) {
+        scores.set("unhealthy", (scores.get("unhealthy") || 0) + 4.2);
+      }
     }
 
     // 计算 Softmax / 最大后验概率
