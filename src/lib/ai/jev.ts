@@ -123,7 +123,7 @@ export function runBuiltinJevDecision(
 
   // 2. Score / Boolean 模式
   return {
-    answer: text.includes("fail") || text.includes("error") || text.includes("killed"),
+    answer: fullText.includes("fail") || fullText.includes("error") || fullText.includes("killed"),
     confidence: 0.88,
     latency_ms: Math.max(1, Date.now() - start),
     engine: "builtin_jev",
