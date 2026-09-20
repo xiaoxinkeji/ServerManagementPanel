@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "Traduzione in comando shell...",
   "docker.terminal.copilotInsert": "Inserisci",
   "docker.terminal.copilotRun": "Inserisci ed esegui",
+  "docker.volumes.snapshotBtn": "Crea snapshot",
+  "docker.volumes.snapshotCreating": "Creazione snapshot in corso...",
+  "docker.volumes.snapshotRestoreBtn": "Ripristina questo snapshot",
+  "docker.volumes.snapshotRestoring": "Ripristino sicuro dei dati in corso...",
+  "docker.volumes.snapshotDelete": "Elimina snapshot",
+  "docker.volumes.snapshotSuccess": "Snapshot del volume creato con successo!",
+  "docker.volumes.snapshotRestoreSuccess": "Dati ripristinati con successo dallo snapshot selezionato!",
   "docker.installer.templateTitle": "Modelli di distribuzione rapida app e IA",
   "docker.installer.templateSubtitle": "Fai clic per compilare un modello Docker Compose verificato"
 }

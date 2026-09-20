@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "正在智能翻译指令...",
   "docker.terminal.copilotInsert": "填入终端",
   "docker.terminal.copilotRun": "填入并回车执行",
+  "docker.volumes.snapshotBtn": "创建安全快照",
+  "docker.volumes.snapshotCreating": "正在生成快照...",
+  "docker.volumes.snapshotRestoreBtn": "恢复此快照",
+  "docker.volumes.snapshotRestoring": "正在安全回滚数据...",
+  "docker.volumes.snapshotDelete": "删除快照",
+  "docker.volumes.snapshotSuccess": "卷快照创建成功！",
+  "docker.volumes.snapshotRestoreSuccess": "数据已成功回滚至所选快照！",
   "docker.installer.templateTitle": "快速部署常用应用与 AI 工作站",
   "docker.installer.templateSubtitle": "点击一键填入经测试验证的标准 Docker Compose 编排模板"
 }

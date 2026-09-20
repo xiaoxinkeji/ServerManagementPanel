@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "Translating to shell command...",
   "docker.terminal.copilotInsert": "Insert to Terminal",
   "docker.terminal.copilotRun": "Insert & Run",
+  "docker.volumes.snapshotBtn": "Create Snapshot",
+  "docker.volumes.snapshotCreating": "Creating snapshot...",
+  "docker.volumes.snapshotRestoreBtn": "Restore Snapshot",
+  "docker.volumes.snapshotRestoring": "Restoring data safely...",
+  "docker.volumes.snapshotDelete": "Delete Snapshot",
+  "docker.volumes.snapshotSuccess": "Volume snapshot created successfully!",
+  "docker.volumes.snapshotRestoreSuccess": "Data rolled back to selected snapshot successfully!",
   "docker.installer.templateTitle": "Quick Deploy Apps & AI Workstations",
   "docker.installer.templateSubtitle": "Click to populate pre-verified production Docker Compose templates"
 }

@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "Traduction en commande shell...",
   "docker.terminal.copilotInsert": "Insérer",
   "docker.terminal.copilotRun": "Insérer et exécuter",
+  "docker.volumes.snapshotBtn": "Créer un instantané",
+  "docker.volumes.snapshotCreating": "Création de l'instantané...",
+  "docker.volumes.snapshotRestoreBtn": "Restaurer cet instantané",
+  "docker.volumes.snapshotRestoring": "Restauration des données en toute sécurité...",
+  "docker.volumes.snapshotDelete": "Supprimer l'instantané",
+  "docker.volumes.snapshotSuccess": "Instantané de volume créé avec succès !",
+  "docker.volumes.snapshotRestoreSuccess": "Données restaurées avec succès depuis l'instantané !",
   "docker.installer.templateTitle": "Modèles de déploiement rapide d'applications et IA",
   "docker.installer.templateSubtitle": "Cliquez pour remplir un modèle Docker Compose vérifié"
 }

@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "Übersetzen in Shell-Befehl...",
   "docker.terminal.copilotInsert": "Einfügen",
   "docker.terminal.copilotRun": "Einfügen & Ausführen",
+  "docker.volumes.snapshotBtn": "Snapshot erstellen",
+  "docker.volumes.snapshotCreating": "Snapshot wird erstellt...",
+  "docker.volumes.snapshotRestoreBtn": "Snapshot wiederherstellen",
+  "docker.volumes.snapshotRestoring": "Daten werden sicher wiederhergestellt...",
+  "docker.volumes.snapshotDelete": "Snapshot löschen",
+  "docker.volumes.snapshotSuccess": "Volume-Snapshot erfolgreich erstellt!",
+  "docker.volumes.snapshotRestoreSuccess": "Daten erfolgreich aus Snapshot wiederhergestellt!",
   "docker.installer.templateTitle": "Schnellstart-Vorlagen für Apps & KI",
   "docker.installer.templateSubtitle": "Klicken Sie hier, um getestete Docker-Compose-Vorlagen einzufügen"
 }

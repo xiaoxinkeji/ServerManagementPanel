@@ -3845,6 +3845,13 @@
   "docker.terminal.copilotTranslating": "Komuta çevriliyor...",
   "docker.terminal.copilotInsert": "Terminale Ekle",
   "docker.terminal.copilotRun": "Ekle ve Çalıştır",
+  "docker.volumes.snapshotBtn": "Güvenli Anlık Görüntü Al",
+  "docker.volumes.snapshotCreating": "Anlık görüntü alınıyor...",
+  "docker.volumes.snapshotRestoreBtn": "Bu Görüntüyü Geri Yükle",
+  "docker.volumes.snapshotRestoring": "Veriler güvenle geri yükleniyor...",
+  "docker.volumes.snapshotDelete": "Anlık Görüntüyü Sil",
+  "docker.volumes.snapshotSuccess": "Volume anlık görüntüsü başarıyla alındı!",
+  "docker.volumes.snapshotRestoreSuccess": "Veriler seçilen anlık görüntüye başarıyla geri yüklendi!",
   "docker.installer.templateTitle": "Hızlı Uygulama ve Yapay Zeka Şablonları",
   "docker.installer.templateSubtitle": "Doğrulanmış standart Docker Compose şablonunu tek tıkla doldurun"
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronRight, Download, File as FileIcon, Folder, Home, Link2 } from "lucide-react";
+import { Camera, ChevronRight, Download, File as FileIcon, Folder, Home, Link2, RotateCcw, Trash2 } from "lucide-react";
+import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 
 import { formatBytes } from "@/lib/metrics/catalog";
 import type { FileEntry } from "@/lib/docker/listing";
@@ -36,6 +37,123 @@ export function VolumeBrowser({ volume, canAct }: { volume: string; canAct: bool
   const [entries, setEntries] = useState<FileEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // 快照相关状态
+  const [snapshots, setSnapshots] = useState<{
+    name: string;
+    createdAt: number;
+    formattedDate: string;
+  }[]>([]);
+  const [snapLoading, setSnapLoading] = useState(false);
+  const [snapFeedback, setSnapFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch(`/api/docker/volumes/snapshots?volume=${encodeURIComponent(volume)}`);
+        if (res.ok && active) {
+          const data = await res.json();
+          setSnapshots(data.snapshots || []);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [volume]);
+
+  async function reloadSnapshots() {
+    try {
+      const res = await fetch(`/api/docker/volumes/snapshots?volume=${encodeURIComponent(volume)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSnapshots(data.snapshots || []);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  async function createSnapshot() {
+    if (!canAct) return;
+    setSnapLoading(true);
+    setSnapFeedback(null);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch("/api/docker/volumes/snapshots", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: csrf,
+        },
+        body: JSON.stringify({ action: "create", volume }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSnapFeedback(t("docker.volumes.snapshotSuccess"));
+        await reloadSnapshots();
+      } else {
+        alert(data.error || "Snapshot failed");
+      }
+    } catch {
+      alert(t("common.errors.network"));
+    } finally {
+      setSnapLoading(false);
+    }
+  }
+
+  async function restoreSnapshot(snapshotName: string) {
+    if (!canAct) return;
+    if (!window.confirm(`${t("docker.volumes.snapshotRestoreBtn")} ${snapshotName}?`)) return;
+    setSnapLoading(true);
+    setSnapFeedback(null);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch("/api/docker/volumes/snapshots", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: csrf,
+        },
+        body: JSON.stringify({ action: "restore", volume, snapshot: snapshotName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSnapFeedback(t("docker.volumes.snapshotRestoreSuccess"));
+        // 刷新文件列表
+        setCwd("/");
+      } else {
+        alert(data.error || "Restore failed");
+      }
+    } catch {
+      alert(t("common.errors.network"));
+    } finally {
+      setSnapLoading(false);
+    }
+  }
+
+  async function deleteSnapshot(snapshotName: string) {
+    if (!canAct) return;
+    if (!window.confirm(`${t("docker.volumes.snapshotDelete")} ${snapshotName}?`)) return;
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch(`/api/docker/volumes/snapshots?snapshot=${encodeURIComponent(snapshotName)}`, {
+        method: "DELETE",
+        headers: { [CSRF_HEADER]: csrf },
+      });
+      if (res.ok) {
+        await reloadSnapshots();
+      }
+    } catch {
+      alert(t("common.errors.network"));
+    }
+  }
 
   /*
     Durum yazan her şey effect'ten AYRI bir callback'te: setState'i effect
@@ -85,7 +203,62 @@ export function VolumeBrowser({ volume, canAct }: { volume: string; canAct: bool
   const parcalar = cwd === "/" ? [] : cwd.slice(1).split("/");
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* 顶部快照管理控制区 */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-surface/40 p-2.5 backdrop-blur-sm">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => void createSnapshot()}
+            disabled={snapLoading || !canAct}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            <Camera className={`size-3.5 ${snapLoading ? "animate-spin" : ""}`} />
+            <span>{snapLoading ? t("docker.volumes.snapshotCreating") : t("docker.volumes.snapshotBtn")}</span>
+          </button>
+          {snapFeedback && <span className="text-xs text-ok font-medium">✓ {snapFeedback}</span>}
+        </div>
+
+        {snapshots.length > 0 && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-subtle">历史快照 ({snapshots.length}):</span>
+            <div className="flex items-center gap-1 overflow-x-auto max-w-sm py-0.5">
+              {snapshots.slice(0, 3).map((snap) => (
+                <div
+                  key={snap.name}
+                  className="inline-flex items-center gap-1 rounded-md border border-line bg-canvas px-2 py-0.5 font-mono text-[11px]"
+                >
+                  <span className="truncate max-w-[100px]" title={snap.name}>
+                    {new Date(snap.createdAt).toLocaleTimeString()}
+                  </span>
+                  {canAct && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => void restoreSnapshot(snap.name)}
+                        disabled={snapLoading}
+                        title={t("docker.volumes.snapshotRestoreBtn")}
+                        className="text-subtle hover:text-brand transition-colors"
+                      >
+                        <RotateCcw className="size-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void deleteSnapshot(snap.name)}
+                        title={t("docker.volumes.snapshotDelete")}
+                        className="text-subtle hover:text-danger transition-colors"
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-wrap items-center gap-1 text-xs">
         <button
           type="button"
