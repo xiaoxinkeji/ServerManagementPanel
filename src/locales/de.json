@@ -3836,6 +3836,10 @@
   "docker.diagnose.deepTitle": "KI-Experten-Diagnose und Befehlsrezept",
   "docker.diagnose.copyCmd": "Befehl kopieren",
   "docker.diagnose.copied": "Kopiert",
+  "docker.diagnose.autoRemediateBtn": "⚡ KI-Autoreparatur autorisieren",
+  "docker.diagnose.autoRemediating": "KI führt Reparatur sicher aus...",
+  "docker.diagnose.autoRemediateSuccess": "Reparatur erfolgreich durchgeführt, Schutzschalter zurückgesetzt!",
+  "docker.diagnose.autoRemediateFailed": "Autoreparatur fehlgeschlagen: ",
   "docker.installer.templateTitle": "Schnellstart-Vorlagen für Apps & KI",
   "docker.installer.templateSubtitle": "Klicken Sie hier, um getestete Docker-Compose-Vorlagen einzufügen"
 }

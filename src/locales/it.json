@@ -3836,6 +3836,10 @@
   "docker.diagnose.deepTitle": "Prescrizione di riparazione dell'esperto IA",
   "docker.diagnose.copyCmd": "Copia comando",
   "docker.diagnose.copied": "Copiato",
+  "docker.diagnose.autoRemediateBtn": "⚡ Autorizza autoriparazione IA",
+  "docker.diagnose.autoRemediating": "L'IA sta eseguendo la riparazione in sicurezza...",
+  "docker.diagnose.autoRemediateSuccess": "Autoriparazione eseguita con successo, salvavita ripristinato!",
+  "docker.diagnose.autoRemediateFailed": "Autoriparazione non riuscita: ",
   "docker.installer.templateTitle": "Modelli di distribuzione rapida app e IA",
   "docker.installer.templateSubtitle": "Fai clic per compilare un modello Docker Compose verificato"
 }

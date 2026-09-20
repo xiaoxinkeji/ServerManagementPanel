@@ -114,6 +114,8 @@ export function LogViewer({
   const [font, setFont] = useState(11);
   const [diagnosing, setDiagnosing] = useState(false);
   const [deepDiagnosing, setDeepDiagnosing] = useState(false);
+  const [remediating, setRemediating] = useState<string | null>(null);
+  const [remediateResult, setRemediateResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [copiedCmd, setCopiedCmd] = useState<number | null>(null);
   const [prescription, setPrescription] = useState<{
     rootCause: string;
@@ -284,6 +286,43 @@ export function LogViewer({
       alert("Network error");
     } finally {
       setDeepDiagnosing(false);
+    }
+  }
+
+  async function executeRemediation(cmd: string) {
+    if (!canAct) return;
+    setRemediating(cmd);
+    setRemediateResult(null);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch("/api/ai/remediate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: csrf,
+        },
+        body: JSON.stringify({
+          container: containerName || containerId,
+          command: cmd,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRemediateResult({
+          ok: true,
+          msg: data.actionExecuted || t("docker.diagnose.autoRemediateSuccess"),
+        });
+      } else {
+        setRemediateResult({
+          ok: false,
+          msg: data.error || data.reason || "Execution failed",
+        });
+      }
+    } catch {
+      setRemediateResult({ ok: false, msg: "Network error" });
+    } finally {
+      setRemediating(null);
     }
   }
 
@@ -466,19 +505,40 @@ export function LogViewer({
 
               {prescription.commands && prescription.commands.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-semibold text-subtle uppercase tracking-wider">建议排查与修复指令</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-subtle uppercase tracking-wider">建议排查与修复指令</span>
+                    {remediateResult && (
+                      <span className={`text-[11px] font-medium ${remediateResult.ok ? "text-ok" : "text-danger"}`}>
+                        {remediateResult.ok ? `✓ ${remediateResult.msg}` : `✕ ${remediateResult.msg}`}
+                      </span>
+                    )}
+                  </div>
                   <div className="space-y-2">
                     {prescription.commands.map((cmd, idx) => (
-                      <div key={idx} className="relative rounded-lg border border-line bg-canvas/90 p-2.5 font-mono text-xs">
-                        <pre className="overflow-x-auto whitespace-pre-wrap pr-8 text-ink">{cmd}</pre>
-                        <button
-                          type="button"
-                          onClick={() => copyCommand(cmd, idx)}
-                          className="absolute right-2 top-2 rounded p-1 text-subtle hover:bg-surface hover:text-ink transition-colors"
-                          title={t("docker.diagnose.copyCmd")}
-                        >
-                          {copiedCmd === idx ? <Check className="size-3.5 text-ok" /> : <Copy className="size-3.5" />}
-                        </button>
+                      <div key={idx} className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-line bg-canvas/90 p-2.5 font-mono text-xs">
+                        <pre className="overflow-x-auto whitespace-pre-wrap pr-2 text-ink">{cmd}</pre>
+                        <div className="flex items-center gap-1 self-end sm:self-center shrink-0">
+                          {canAct && !cmd.startsWith("#") && (
+                            <button
+                              type="button"
+                              onClick={() => executeRemediation(cmd)}
+                              disabled={remediating !== null}
+                              className="inline-flex items-center gap-1 rounded-lg bg-brand/15 hover:bg-brand/25 text-brand px-2 py-1 font-sans text-[11px] font-medium transition-colors disabled:opacity-50"
+                              title={t("docker.diagnose.autoRemediateBtn")}
+                            >
+                              <Sparkles className={`size-3 ${remediating === cmd ? "animate-spin" : ""}`} />
+                              {remediating === cmd ? t("docker.diagnose.autoRemediating") : t("docker.diagnose.autoRemediateBtn")}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => copyCommand(cmd, idx)}
+                            className="rounded p-1 text-subtle hover:bg-surface hover:text-ink transition-colors"
+                            title={t("docker.diagnose.copyCmd")}
+                          >
+                            {copiedCmd === idx ? <Check className="size-3.5 text-ok" /> : <Copy className="size-3.5" />}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

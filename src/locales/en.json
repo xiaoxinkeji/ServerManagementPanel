@@ -3836,6 +3836,10 @@
   "docker.diagnose.deepTitle": "AI Expert Root Cause & Fix Prescription",
   "docker.diagnose.copyCmd": "Copy Command",
   "docker.diagnose.copied": "Copied",
+  "docker.diagnose.autoRemediateBtn": "⚡ Authorize AI Auto-Remediation",
+  "docker.diagnose.autoRemediating": "AI is safely executing remediation...",
+  "docker.diagnose.autoRemediateSuccess": "Auto-remediation executed successfully, circuit breaker reset!",
+  "docker.diagnose.autoRemediateFailed": "Auto-remediation failed: ",
   "docker.installer.templateTitle": "Quick Deploy Apps & AI Workstations",
   "docker.installer.templateSubtitle": "Click to populate pre-verified production Docker Compose templates"
 }

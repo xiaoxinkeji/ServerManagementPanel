@@ -3836,6 +3836,10 @@
   "docker.diagnose.deepTitle": "Prescription de réparation par expert IA",
   "docker.diagnose.copyCmd": "Copier la commande",
   "docker.diagnose.copied": "Copié",
+  "docker.diagnose.autoRemediateBtn": "⚡ Autoriser l'auto-réparation IA",
+  "docker.diagnose.autoRemediating": "L'IA exécute la réparation en toute sécurité...",
+  "docker.diagnose.autoRemediateSuccess": "Auto-réparation réussie, disjoncteur réinitialisé !",
+  "docker.diagnose.autoRemediateFailed": "Échec de l'auto-réparation : ",
   "docker.installer.templateTitle": "Modèles de déploiement rapide d'applications et IA",
   "docker.installer.templateSubtitle": "Cliquez pour remplir un modèle Docker Compose vérifié"
 }

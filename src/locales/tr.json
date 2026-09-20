@@ -3835,7 +3835,11 @@
   "docker.diagnose.deepGenerating": "Kök neden analiz ediliyor ve onarım komutları hazırlanıyor...",
   "docker.diagnose.deepTitle": "Yapay Zeka Uzmanı Analizi ve Çözüm Reçetesi",
   "docker.diagnose.copyCmd": "Komutu Kopyala",
-  "docker.diagnose.copied": "Kopyalandı",
+  "docker.diagnose.copied": "Kopyaladı",
+  "docker.diagnose.autoRemediateBtn": "⚡ Yapay Zeka Otomatik Onarımı Yetkilendir",
+  "docker.diagnose.autoRemediating": "Yapay zeka onarımı güvenli şekilde uyguluyor...",
+  "docker.diagnose.autoRemediateSuccess": "Otomatik onarım başarıyla uygulandı, devre kesici sıfırlandı!",
+  "docker.diagnose.autoRemediateFailed": "Otomatik onarım başarısız: ",
   "docker.installer.templateTitle": "Hızlı Uygulama ve Yapay Zeka Şablonları",
   "docker.installer.templateSubtitle": "Doğrulanmış standart Docker Compose şablonunu tek tıkla doldurun"
 }

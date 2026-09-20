@@ -3836,6 +3836,10 @@
   "docker.diagnose.deepTitle": "AI 专家深度分析与排查处方",
   "docker.diagnose.copyCmd": "复制命令",
   "docker.diagnose.copied": "已复制",
+  "docker.diagnose.autoRemediateBtn": "⚡ 授权 AI 一键自动修复",
+  "docker.diagnose.autoRemediating": "AI 正在安全执行修复指令...",
+  "docker.diagnose.autoRemediateSuccess": "自动修复指令已成功执行，熔断保护已重置！",
+  "docker.diagnose.autoRemediateFailed": "自动修复失败：",
   "docker.installer.templateTitle": "快速部署常用应用与 AI 工作站",
   "docker.installer.templateSubtitle": "点击一键填入经测试验证的标准 Docker Compose 编排模板"
 }
