@@ -269,12 +269,12 @@ export function ProxyScreen({
         </p>
       )}
 
-      <section className="rounded-lg border border-line bg-surface p-5">
+      <section className="rounded-3xl border border-line/60 bg-surface/80 p-6 shadow-sm backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold">
-            <Globe className="size-4 text-subtle" aria-hidden />
+          <h2 className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-ink">
+            <Globe className="size-4.5 text-brand" aria-hidden />
             {t("proxy.hosts.title")}
-            <span className="font-normal text-subtle">{hosts.length}</span>
+            <span className="rounded-full bg-canvas/80 px-2 py-0.5 text-xs font-mono text-subtle border border-line/50">{hosts.length}</span>
           </h2>
           <button
             type="button"
@@ -282,20 +282,20 @@ export function ProxyScreen({
               setError(null);
               setHostModal({ open: true, form: blankHost });
             }}
-            className="flex items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white"
+            className="flex items-center gap-1.5 rounded-2xl bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand/90 active:scale-95"
           >
-            <Plus className="size-4" /> {t("proxy.hosts.publish")}
+            <Plus className="size-3.5" /> {t("proxy.hosts.publish")}
           </button>
         </div>
 
-        <p className="mt-1 text-xs text-subtle">
+        <p className="mt-1.5 text-xs text-subtle leading-relaxed">
           <Rich text={t("proxy.hosts.intro")} values={{ cmd: <code>caddy reload</code> }} />
         </p>
 
         {hosts.length === 0 ? (
-          <p className="mt-4 text-sm text-subtle">{t("proxy.hosts.empty")}</p>
+          <p className="mt-5 text-sm text-subtle">{t("proxy.hosts.empty")}</p>
         ) : (
-          <ul className="mt-4 divide-y divide-line rounded-md border border-line">
+          <ul className="mt-5 divide-y divide-line/40 rounded-2xl border border-line/60 bg-canvas/30 overflow-hidden">
             {hosts.map((host) => {
               const cert = certTone(host, t);
               return (

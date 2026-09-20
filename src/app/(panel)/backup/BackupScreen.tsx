@@ -254,12 +254,14 @@ export function BackupScreen({
       </section>
 
       {/* --- İşler --- */}
-      <section className="rounded-lg border border-line bg-surface">
-        <div className="flex items-center justify-between border-b border-line px-5 py-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold">
-            <HardDrive className="size-4 text-subtle" aria-hidden />
+      <section className="rounded-3xl border border-line/60 bg-surface/80 shadow-sm backdrop-blur-xl overflow-hidden">
+        <div className="flex items-center justify-between border-b border-line/40 px-6 py-4">
+          <h2 className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-ink">
+            <div className="flex size-7.5 items-center justify-center rounded-xl bg-brand/10 text-brand shadow-2xs">
+              <HardDrive className="size-4" aria-hidden />
+            </div>
             {t("backup.jobs.title")}
-            <span className="font-normal text-subtle">{data.jobs.length}</span>
+            <span className="rounded-full bg-canvas/80 px-2 py-0.5 text-xs font-mono text-subtle border border-line/50">{data.jobs.length}</span>
           </h2>
           <button
             type="button"
@@ -280,9 +282,9 @@ export function BackupScreen({
                 enabled: true,
               })
             }
-            className="flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-sm transition-colors hover:border-brand disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-2xl bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand/90 active:scale-95 disabled:opacity-50"
           >
-            <Plus className="size-4" /> {t("backup.jobs.add")}
+            <Plus className="size-3.5" /> {t("backup.jobs.add")}
           </button>
         </div>
 

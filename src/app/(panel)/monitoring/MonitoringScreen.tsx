@@ -278,23 +278,23 @@ export function MonitoringScreen({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5 rounded-2xl bg-surface/70 border border-line/60 p-1 backdrop-blur-md shadow-2xs">
           {RANGES.map((option) => (
             <button
               key={option.id}
               type="button"
               onClick={() => setRange(option.id)}
-              className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+              className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150 active:scale-95 ${
                 range === option.id
-                  ? "border-brand bg-brand/10 text-brand"
-                  : "border-line text-subtle hover:text-ink"
+                  ? "bg-brand text-white shadow-xs"
+                  : "text-subtle hover:text-ink hover:bg-canvas/60"
               }`}
             >
               {rangeLabel(dict, option.id)}
             </button>
           ))}
         </div>
-        <span className="text-xs text-subtle">
+        <span className="text-xs text-subtle font-mono">
           {chartsStale
             ? t("metrics.screen.loading")
             : t("metrics.screen.resolution", { tier: tierLabel(dict, data.tier) })}
@@ -355,7 +355,7 @@ function Card({
   title,
   value,
   note,
-  valueClass = "text-ink",
+  valueClass,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -364,15 +364,17 @@ function Card({
   valueClass?: string;
 }) {
   return (
-    <div className="rounded-lg border border-line bg-surface p-4">
-      <div className="flex items-center gap-1.5 text-xs text-subtle">
-        {icon}
-        {title}
+    <div className="rounded-3xl border border-line/60 bg-surface/80 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+      <div className="flex items-center gap-2 text-xs font-medium text-subtle">
+        <div className="flex size-7 items-center justify-center rounded-xl bg-canvas text-brand shadow-2xs">
+          {icon}
+        </div>
+        <span>{title}</span>
       </div>
-      <div className={`mt-1 truncate text-2xl font-semibold ${valueClass}`} title={value}>
+      <div className={`mt-3 truncate text-3xl font-semibold tracking-tight tabular-nums ${valueClass}`} title={value}>
         {value}
       </div>
-      <div className="mt-0.5 truncate text-xs text-subtle" title={note}>
+      <div className="mt-1 truncate text-xs text-subtle font-medium" title={note}>
         {note}
       </div>
     </div>
@@ -400,14 +402,14 @@ function ChartCard({
   const names = legendNames(series, dict);
 
   return (
-    <section className="rounded-lg border border-line bg-surface p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-semibold">{title}</h2>
+    <section className="rounded-3xl border border-line/60 bg-surface/80 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/40 pb-3.5">
+        <h2 className="font-semibold tracking-tight text-base text-ink">{title}</h2>
         <div className="flex flex-wrap gap-3">
           {names.map((name, i) => (
-            <span key={name} className="flex items-center gap-1.5 text-xs text-subtle">
+            <span key={name} className="flex items-center gap-1.5 text-xs text-subtle font-medium">
               <span
-                className="size-2 rounded-full"
+                className="size-2.5 rounded-full shadow-2xs"
                 style={{ backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length] }}
               />
               {name}

@@ -284,15 +284,15 @@ export function UptimeScreen({
             return (
               <section
                 key={monitor.id}
-                className="rounded-lg border border-line bg-surface p-4"
+                className="rounded-3xl border border-line/60 bg-surface/80 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`size-2.5 shrink-0 rounded-full ${style.dot}`} />
-                      <span className="font-medium">{monitor.name}</span>
-                      <span className={`text-xs ${style.text}`}>{t(style.label)}</span>
-                      <span className="rounded border border-line px-1 text-[10px] text-subtle">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <span className={`size-2.5 shrink-0 rounded-full shadow-xs ${style.dot}`} />
+                      <span className="font-semibold tracking-tight text-ink text-sm">{monitor.name}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${style.text} bg-canvas/60 border border-line/40`}>{t(style.label)}</span>
+                      <span className="rounded-md border border-line/50 bg-canvas/40 px-1.5 py-0.5 font-mono text-[10px] text-subtle">
                         {typeLabel}
                       </span>
                     </div>

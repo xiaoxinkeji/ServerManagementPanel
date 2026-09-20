@@ -76,13 +76,15 @@ function NavCard({
   return (
     <Link
       href={href}
-      className="rounded-lg border border-line bg-surface px-5 py-4 transition-colors hover:border-brand"
+      className="rounded-3xl border border-line/60 bg-surface/80 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md active:scale-[0.99]"
     >
-      <span className="flex items-center gap-2 text-sm font-semibold">
-        {icon}
+      <span className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-ink">
+        <div className="flex size-7.5 items-center justify-center rounded-xl bg-brand/10 text-brand shadow-2xs">
+          {icon}
+        </div>
         {title}
       </span>
-      <span className="mt-1 block text-sm text-subtle">{description}</span>
+      <span className="mt-2 block text-xs text-subtle leading-relaxed">{description}</span>
     </Link>
   );
 }

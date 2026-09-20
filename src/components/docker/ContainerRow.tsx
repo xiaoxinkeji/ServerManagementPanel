@@ -573,8 +573,10 @@ export function IconButton({
       aria-label={title}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded border border-line p-1.5 text-subtle transition-colors disabled:opacity-40 ${
-        danger ? "hover:border-danger hover:text-danger" : "hover:text-ink"
+      className={`flex size-7.5 items-center justify-center rounded-xl border border-line/60 bg-surface/80 shadow-2xs transition-all duration-150 active:scale-90 disabled:opacity-40 ${
+        danger
+          ? "text-danger hover:border-danger/40 hover:bg-danger/10 hover:text-danger"
+          : "text-subtle hover:border-line hover:bg-canvas hover:text-ink hover:shadow-xs"
       }`}
     >
       {children}
