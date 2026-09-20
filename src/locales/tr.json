@@ -3840,6 +3840,11 @@
   "docker.diagnose.autoRemediating": "Yapay zeka onarımı güvenli şekilde uyguluyor...",
   "docker.diagnose.autoRemediateSuccess": "Otomatik onarım başarıyla uygulandı, devre kesici sıfırlandı!",
   "docker.diagnose.autoRemediateFailed": "Otomatik onarım başarısız: ",
+  "docker.terminal.copilotPlaceholder": "Doğal dille komut isteyin (örn: bellek kullanımını kontrol et, ağ testi)...",
+  "docker.terminal.copilotBtn": "Yapay Zeka Yardımcısı",
+  "docker.terminal.copilotTranslating": "Komuta çevriliyor...",
+  "docker.terminal.copilotInsert": "Terminale Ekle",
+  "docker.terminal.copilotRun": "Ekle ve Çalıştır",
   "docker.installer.templateTitle": "Hızlı Uygulama ve Yapay Zeka Şablonları",
   "docker.installer.templateSubtitle": "Doğrulanmış standart Docker Compose şablonunu tek tıkla doldurun"
 }

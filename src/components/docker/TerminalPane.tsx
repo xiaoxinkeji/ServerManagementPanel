@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Sparkles, CornerDownLeft } from "lucide-react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -57,6 +57,51 @@ export function TerminalPane({
   const [user, setUser] = useState("");
   const [nonce, setNonce] = useState(0);
   const [font, setFont] = useState(13);
+
+  // AI Copilot 状态
+  const [copilotPrompt, setCopilotPrompt] = useState("");
+  const [copilotLoading, setCopilotLoading] = useState(false);
+  const [copilotResult, setCopilotResult] = useState<{
+    command: string;
+    explanation: string;
+    safe: boolean;
+    model: string;
+  } | null>(null);
+
+  async function translateCopilot() {
+    if (!copilotPrompt.trim()) return;
+    setCopilotLoading(true);
+    try {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE}=([^;]*)`));
+      const csrf = match ? decodeURIComponent(match[1]) : "";
+      const res = await fetch("/api/ai/copilot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [CSRF_HEADER]: csrf,
+        },
+        body: JSON.stringify({
+          prompt: copilotPrompt,
+          containerName,
+          shell,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCopilotResult(data);
+      }
+    } catch {
+      // 优雅失败
+    } finally {
+      setCopilotLoading(false);
+    }
+  }
+
+  function applyCopilotCommand(runImmediately = false) {
+    if (!copilotResult?.command) return;
+    const text = copilotResult.command + (runImmediately ? "\r" : "");
+    sendKey(text);
+  }
 
   /**
    * Sanal tuş çubuğu bir diziyi kullanıcı yazmış gibi terminale verir;
@@ -299,6 +344,63 @@ export function TerminalPane({
         ref={hostRef}
         className="h-[50dvh] overflow-hidden rounded-md border border-line bg-canvas p-2 sm:h-[60vh]"
       />
+
+      {/* AI Copilot 智能指令助手面板 */}
+      <div className="rounded-xl border border-line bg-canvas/80 p-2.5 backdrop-blur-md space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Sparkles className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-brand" />
+            <input
+              type="text"
+              value={copilotPrompt}
+              onChange={(e) => setCopilotPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void translateCopilot();
+                }
+              }}
+              placeholder={t("docker.terminal.copilotPlaceholder")}
+              className="w-full rounded-lg border border-line bg-canvas/90 py-1.5 pl-8 pr-3 text-xs outline-none focus:border-brand transition-colors"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => void translateCopilot()}
+            disabled={copilotLoading || !copilotPrompt.trim()}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40 shrink-0"
+          >
+            <Sparkles className={`size-3.5 ${copilotLoading ? "animate-spin" : ""}`} />
+            <span>{copilotLoading ? t("docker.terminal.copilotTranslating") : t("docker.terminal.copilotBtn")}</span>
+          </button>
+        </div>
+
+        {copilotResult && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-brand/20 bg-brand/5 p-2 font-mono text-xs">
+            <div className="space-y-0.5 overflow-hidden">
+              <div className="font-semibold text-brand truncate">{copilotResult.command}</div>
+              <div className="font-sans text-[11px] text-subtle truncate">{copilotResult.explanation}</div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <button
+                type="button"
+                onClick={() => applyCopilotCommand(false)}
+                className="rounded-md border border-line bg-surface px-2 py-1 font-sans text-[11px] text-ink transition-colors hover:border-brand hover:text-brand"
+              >
+                {t("docker.terminal.copilotInsert")}
+              </button>
+              <button
+                type="button"
+                onClick={() => applyCopilotCommand(true)}
+                className="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-1 font-sans text-[11px] font-medium text-white transition-opacity hover:opacity-90"
+              >
+                <CornerDownLeft className="size-3" />
+                {t("docker.terminal.copilotRun")}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/*
         Dokunmatik klavyede Esc, Tab, Ctrl ve ok tuşları yok — onlarsız bir

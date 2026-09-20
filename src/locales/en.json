@@ -3840,6 +3840,11 @@
   "docker.diagnose.autoRemediating": "AI is safely executing remediation...",
   "docker.diagnose.autoRemediateSuccess": "Auto-remediation executed successfully, circuit breaker reset!",
   "docker.diagnose.autoRemediateFailed": "Auto-remediation failed: ",
+  "docker.terminal.copilotPlaceholder": "Ask in natural language (e.g. check memory usage, test internet connectivity)...",
+  "docker.terminal.copilotBtn": "AI Copilot",
+  "docker.terminal.copilotTranslating": "Translating to shell command...",
+  "docker.terminal.copilotInsert": "Insert to Terminal",
+  "docker.terminal.copilotRun": "Insert & Run",
   "docker.installer.templateTitle": "Quick Deploy Apps & AI Workstations",
   "docker.installer.templateSubtitle": "Click to populate pre-verified production Docker Compose templates"
 }

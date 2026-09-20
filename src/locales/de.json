@@ -3840,6 +3840,11 @@
   "docker.diagnose.autoRemediating": "KI führt Reparatur sicher aus...",
   "docker.diagnose.autoRemediateSuccess": "Reparatur erfolgreich durchgeführt, Schutzschalter zurückgesetzt!",
   "docker.diagnose.autoRemediateFailed": "Autoreparatur fehlgeschlagen: ",
+  "docker.terminal.copilotPlaceholder": "In natürlicher Sprache fragen (z.B. Speichernutzung prüfen, Ping-Test)...",
+  "docker.terminal.copilotBtn": "KI-Copilot",
+  "docker.terminal.copilotTranslating": "Übersetzen in Shell-Befehl...",
+  "docker.terminal.copilotInsert": "Einfügen",
+  "docker.terminal.copilotRun": "Einfügen & Ausführen",
   "docker.installer.templateTitle": "Schnellstart-Vorlagen für Apps & KI",
   "docker.installer.templateSubtitle": "Klicken Sie hier, um getestete Docker-Compose-Vorlagen einzufügen"
 }

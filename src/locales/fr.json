@@ -3840,6 +3840,11 @@
   "docker.diagnose.autoRemediating": "L'IA exécute la réparation en toute sécurité...",
   "docker.diagnose.autoRemediateSuccess": "Auto-réparation réussie, disjoncteur réinitialisé !",
   "docker.diagnose.autoRemediateFailed": "Échec de l'auto-réparation : ",
+  "docker.terminal.copilotPlaceholder": "Décrivez ce que vous souhaitez faire (ex. vérifier la RAM, tester la connexion)...",
+  "docker.terminal.copilotBtn": "Copilote IA",
+  "docker.terminal.copilotTranslating": "Traduction en commande shell...",
+  "docker.terminal.copilotInsert": "Insérer",
+  "docker.terminal.copilotRun": "Insérer et exécuter",
   "docker.installer.templateTitle": "Modèles de déploiement rapide d'applications et IA",
   "docker.installer.templateSubtitle": "Cliquez pour remplir un modèle Docker Compose vérifié"
 }

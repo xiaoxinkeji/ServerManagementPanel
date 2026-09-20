@@ -3840,6 +3840,11 @@
   "docker.diagnose.autoRemediating": "L'IA sta eseguendo la riparazione in sicurezza...",
   "docker.diagnose.autoRemediateSuccess": "Autoriparazione eseguita con successo, salvavita ripristinato!",
   "docker.diagnose.autoRemediateFailed": "Autoriparazione non riuscita: ",
+  "docker.terminal.copilotPlaceholder": "Chiedi in linguaggio naturale (es. controlla RAM, testa connessione)...",
+  "docker.terminal.copilotBtn": "Copilota IA",
+  "docker.terminal.copilotTranslating": "Traduzione in comando shell...",
+  "docker.terminal.copilotInsert": "Inserisci",
+  "docker.terminal.copilotRun": "Inserisci ed esegui",
   "docker.installer.templateTitle": "Modelli di distribuzione rapida app e IA",
   "docker.installer.templateSubtitle": "Fai clic per compilare un modello Docker Compose verificato"
 }
