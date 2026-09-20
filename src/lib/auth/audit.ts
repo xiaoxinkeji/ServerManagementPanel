@@ -36,7 +36,7 @@ export function audit(entry: AuditEntry): void {
         entry.result ?? "ok",
       );
   } catch (error) {
-    console.error("[audit] kayıt yazılamadı:", error);
+    console.error("[审计] 日志写入失败：", error);
   }
 }
 

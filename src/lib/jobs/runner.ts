@@ -73,7 +73,7 @@ function computeNextRun(job: JobDefinition, from: Date = new Date()): number | n
     const interval = CronExpressionParser.parse(expression, { currentDate: from });
     return Math.floor(interval.next().getTime() / 1000);
   } catch (error) {
-    console.error(`[jobs] ${job.key} zamanlaması okunamadı:`, error);
+    console.error(`[定时任务] 无法读取 ${job.key} 的调度配置：`, error);
     return null;
   }
 }
@@ -186,7 +186,7 @@ export async function runJobNow(jobKey: string): Promise<{ ok: boolean; detail: 
       "INSERT INTO job_runs (job_key, started_at, duration_ms, status, detail) VALUES (?, ?, ?, 'hata', ?)", // i18n-ignore — DB değeri
     ).run(job.key, Math.floor(startedAt / 1000), duration, message);
 
-    console.error(`[jobs] ${job.key} hata:`, message);
+    console.error(`[定时任务] ${job.key} 执行失败：`, message);
     return { ok: false, detail: message };
   } finally {
     running.delete(job.key);
@@ -238,12 +238,12 @@ export function startScheduler(): void {
   ensureJobRows();
   rescheduleJobs();
   timer = setInterval(() => {
-    tick().catch((error) => console.error("[jobs] tick hatası:", error));
+    tick().catch((error) => console.error("[定时任务] 调度轮询失败：", error));
   }, TICK_MS);
   // Zamanlayıcı process'in kapanmasını engellemesin.
   timer.unref?.();
 
-  console.log(`[jobs] 定时任务调度器已启动 / job scheduler started (${jobDefinitions.length} jobs, owner: ${OWNER})`);
+  console.log(`[定时任务] 调度器已启动（${jobDefinitions.length} 个任务，所有者：${OWNER}）`);
 }
 
 export function jobStatuses(): JobStatusRow[] {

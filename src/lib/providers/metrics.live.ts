@@ -394,8 +394,7 @@ export const liveMetricsProvider: MetricsProvider = {
       warnedNoDisks = true;
       const { proc, root } = await roots();
       console.warn(
-        `[metrics] hiç disk bölümü okunamadı — ${proc}/1/mounts okunuyor mu ve ` + // i18n-ignore — operatör logu
-          `host kökü ${root} altında mount edilmiş mi? (docker-compose: /:/host/root:ro)`, // i18n-ignore — operatör logu
+        `[指标] 未读取到磁盘分区：请确认 ${proc}/1/mounts 可读，且宿主机根目录已挂载到 ${root}（docker-compose: /:/host/root:ro）。`,
       );
     }
 
@@ -403,8 +402,7 @@ export const liveMetricsProvider: MetricsProvider = {
       warnedNoNet = true;
       const { sys } = await roots();
       console.warn(
-        `[metrics] hiç ağ arayüzü okunamadı — fiziksel arayüz ${sys}/class/net ` + // i18n-ignore — operatör logu
-          "altında bulunamadı. Ayarlardan monitoring.net_interfaces ile elle belirtilebilir.", // i18n-ignore — operatör logu
+        `[指标] 未读取到网络接口：${sys}/class/net 下没有可用接口。可在 monitoring.net_interfaces 设置中手动指定。`,
       );
     }
 

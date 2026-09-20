@@ -52,8 +52,8 @@ function readSecret(userId: number): { secret: string | null; enabled: boolean; 
     // kilitlememek için "2FA yok" gibi davranmıyoruz — sessizce yetki vermek
     // güvenlik açığı olurdu. Yönetici 2FA'yı sıfırlamalı.
     console.error(
-      `[2fa] kullanıcı ${userId} TOTP sırrı çözülemedi — MASTER_KEY değişmiş olabilir. ` + // i18n-ignore — operatör logu
-        "Yönetici Kullanıcılar ekranından 2FA'yı sıfırlayabilir.", // i18n-ignore — operatör logu
+      `[双因素认证] 用户 ${userId} 的 TOTP 密钥无法解密，MASTER_KEY 可能已变更。` +
+        "管理员可以在用户管理页面重置双因素认证。",
     );
     return { secret: null, enabled: Number(row.totp_enabled) === 1, username: String(row.username) };
   }

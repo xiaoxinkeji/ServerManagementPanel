@@ -805,7 +805,7 @@ export const liveDockerProvider: DockerProvider = {
         try {
           await request(`/containers/${containerId}?force=1&v=1`, 30_000, "DELETE");
         } catch (error) {
-          console.error(`[docker] geçici container silinemedi (${name}):`, error);
+          console.error(`[Docker] 临时容器删除失败（${name}）：`, error);
         }
       }
     }

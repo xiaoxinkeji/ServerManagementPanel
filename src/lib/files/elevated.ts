@@ -101,7 +101,7 @@ try {
     }
     console.log(JSON.stringify({ ok: true, entries, timedOut: Date.now() > deadline }));
   } else {
-    console.log(JSON.stringify({ ok: false, error: "bilinmeyen islem" }));
+    console.log(JSON.stringify({ ok: false, error: "未知操作" }));
   }
 } catch (error) {
   console.log(JSON.stringify({ ok: false, error: String(error && error.message || error) }));

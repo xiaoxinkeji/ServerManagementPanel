@@ -174,7 +174,7 @@ function unauthorizedAfterFailure(ip: string, detail: string): Response {
   const attempt = authLimiter.hit(ip, getNumber("api.auth_rate_limit_per_minute"));
   if (!attempt.allowed) return rateLimited(attempt.retryAfter);
 
-  console.warn(`[apiv1] kimlik doğrulanamadı (${ip}): ${detail}`);
+  console.warn(`[外部API] 认证失败（${ip}）：${detail}`);
   // Sebep DIŞARI VERİLMİYOR: "bu anahtar iptal edilmiş" ile "böyle bir anahtar
   // yok" arasındaki fark, tarama yapan birine bilgi olurdu.
   return apiError("unauthorized", serverT("apiv1.tokenRequired"));

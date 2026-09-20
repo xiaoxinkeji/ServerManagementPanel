@@ -36,12 +36,12 @@ export function bootstrapAdmin(): void {
 
   const banner = "=".repeat(64);
   console.log(`\n${banner}`);
-  console.log("  [ServerManagementPanel] 管理员账号已就绪 / INITIAL ADMIN ACCOUNT READY");
-  console.log(`  用户名 / Username : ${username}`);
+  console.log("  [ServerManagementPanel] 管理员账号已创建");
+  console.log(`  用户名：${username}`);
   if (provided) {
-    console.log("  密码 / Password   : 来自 ADMIN_PASSWORD 环境变量 / From ADMIN_PASSWORD env");
+    console.log("  密码：来自 ADMIN_PASSWORD 环境变量");
   } else {
-    console.log(`  密码 / Password   : ${password}`);
+    console.log(`  密码：${password}`);
     console.log("  ! 警告: 此密码已记录在启动日志中，请尽快在面板中更改。");
   }
   console.log(`${banner}\n`);

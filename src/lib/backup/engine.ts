@@ -278,7 +278,7 @@ export function isDue(job: BackupJob, now = new Date()): boolean {
     return interval.next().getTime() <= now.getTime();
   } catch {
     // Bozuk ifade sessizce sürekli çalışmaya dönüşmemeli.
-    console.error(`[backup] "${job.name}" zamanlaması okunamadı: ${job.scheduleCron}`);
+    console.error(`[备份] 无法读取任务“${job.name}”的调度表达式：${job.scheduleCron}`);
     return false;
   }
 }

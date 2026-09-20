@@ -81,7 +81,7 @@ def _delay(args):
     """Gecikme dakikası. Docker'daki gibi 0 = hemen."""
     seconds = int(args.get("delaySeconds", 0))
     if seconds < 0 or seconds > 86400:
-        raise ValueError("delaySeconds 0-86400 arasında olmalı")
+        raise ValueError("delaySeconds 必须在 0 到 86400 之间")
     return str(max(0, seconds // 60))
 
 
@@ -89,7 +89,7 @@ def _unit(args):
     unit = str(args.get("unit", ""))
     # systemd birim adı: harf, rakam, nokta, tire, alt çizgi, @ ve :
     if not re.fullmatch(r"[A-Za-z0-9._@:-]{1,128}", unit):
-        raise ValueError("geçersiz birim adı")
+        raise ValueError("服务单元名称无效")
     return unit
 
 
@@ -98,21 +98,21 @@ def _journal_since(args):
     kopyalamaya kalkarsa hem helper hem veritabanı boğulur."""
     seconds = int(args.get("sinceSeconds", 3600))
     if seconds < 1 or seconds > 86400:
-        raise ValueError("sinceSeconds 1-86400 arasında olmalı")
+        raise ValueError("sinceSeconds 必须在 1 到 86400 之间")
     return "-%ds" % seconds
 
 
 def _journal_lines(args):
     lines = int(args.get("lines", 2000))
     if lines < 1 or lines > 50000:
-        raise ValueError("lines 1-50000 arasında olmalı")
+        raise ValueError("行数必须在 1 到 50000 之间")
     return str(lines)
 
 
 def _cron_user(args):
     user = str(args.get("user", "root"))
     if not re.fullmatch(r"[a-z_][a-z0-9_-]{0,31}", user):
-        raise ValueError("gecersiz kullanici adi")
+        raise ValueError("用户名无效")
     return user
 
 
@@ -137,7 +137,7 @@ def _ufw_rule(args):
         r"from [0-9a-fA-F:.]{3,45}(/\d{1,3})? to any port \d{1,5}( proto (tcp|udp))?", rule
     ):
         return rule.split()
-    raise ValueError("gecersiz ufw kurali")
+    raise ValueError("防火墙规则无效")
 
 
 def _ufw_comment(args):
@@ -151,7 +151,7 @@ def _ufw_comment(args):
     if not text:
         return []
     if not re.fullmatch(r"[A-Za-z0-9 ._-]{1,64}", text):
-        raise ValueError("gecersiz aciklama")
+        raise ValueError("规则说明无效")
     return ["comment", text]
 
 
@@ -160,44 +160,44 @@ def _ufw_policy(args):
     policy = str(args.get("policy", ""))
     direction = str(args.get("direction", ""))
     if policy not in ("allow", "deny", "reject"):
-        raise ValueError("gecersiz politika")
+        raise ValueError("防火墙策略无效")
     if direction not in ("incoming", "outgoing", "routed"):
-        raise ValueError("gecersiz yon")
+        raise ValueError("防火墙方向无效")
     return [policy, direction]
 
 
 def _ufw_logging(args):
     level = str(args.get("level", ""))
     if level not in ("off", "low", "medium", "high", "full"):
-        raise ValueError("gecersiz log seviyesi")
+        raise ValueError("日志级别无效")
     return level
 
 
 def _ufw_number(args):
     number = str(args.get("number", ""))
     if not re.fullmatch(r"\d{1,4}", number):
-        raise ValueError("gecersiz kural numarasi")
+        raise ValueError("规则编号无效")
     return number
 
 
 def _jail(args):
     jail = str(args.get("jail", ""))
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,64}", jail):
-        raise ValueError("gecersiz jail adi")
+        raise ValueError("fail2ban 监狱名称无效")
     return jail
 
 
 def _ip(args):
     value = str(args.get("ip", ""))
     if not re.fullmatch(r"[0-9a-fA-F:.]{3,45}", value):
-        raise ValueError("gecersiz IP")
+        raise ValueError("IP 地址无效")
     return value
 
 
 def _project_dir(args):
     path = str(args.get("dir", ""))
     if not path.startswith("/") or ".." in path.split("/"):
-        raise ValueError("geçersiz dizin")
+        raise ValueError("目录无效")
     return path
 
 
@@ -240,7 +240,7 @@ PRESETS = {
 def _preset(args):
     key = str(args.get("preset", ""))
     if key not in PRESETS:
-        raise ValueError("bilinmeyen kalıp: %s" % key)
+        raise ValueError("未知预设命令：%s" % key)
     return key
 
 
@@ -260,11 +260,11 @@ def _command(args):
     """
     command = str(args.get("command", "")).strip()
     if not command:
-        raise ValueError("komut boş")
+        raise ValueError("命令不能为空")
     if len(command) > COMMAND_MAX_LENGTH:
-        raise ValueError("komut çok uzun (en fazla %d karakter)" % COMMAND_MAX_LENGTH)
+        raise ValueError("命令过长（最多 %d 个字符）" % COMMAND_MAX_LENGTH)
     if any(char in command for char in ("\x00", "\n", "\r")):
-        raise ValueError("komut tek satır olmalı")
+        raise ValueError("命令必须是单行文本")
     return command
 
 
@@ -398,7 +398,7 @@ def load_allowlist():
                 pattern = re.compile(parts[1]) if len(parts) > 1 else None
                 allow[action] = pattern
     except FileNotFoundError:
-        log("UYARI: %s bulunamadı — hiçbir eyleme izin verilmiyor" % ALLOW_PATH)
+        log("警告：找不到 %s，当前不允许任何操作" % ALLOW_PATH)
     return allow
 
 
@@ -438,34 +438,34 @@ def handle_request(message, secret, allow):
     signature = message.get("sig")
 
     if not isinstance(payload, dict) or not isinstance(signature, str):
-        return {"ok": False, "error": "biçimsiz istek"}
+        return {"ok": False, "error": "请求格式无效"}
 
     expected = hmac.new(secret, canonical(payload), hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected, signature):
-        log("RED: imza geçersiz")
-        return {"ok": False, "error": "imza geçersiz"}
+        log("拒绝：签名无效")
+        return {"ok": False, "error": "签名无效"}
 
     timestamp = payload.get("ts", 0)
     if abs(time.time() - float(timestamp)) > CLOCK_SKEW_SECONDS:
-        log("RED: zaman damgası penceresi dışında")
-        return {"ok": False, "error": "zaman damgası penceresi dışında"}
+        log("拒绝：请求时间戳超出允许窗口")
+        return {"ok": False, "error": "请求时间戳超出允许窗口"}
 
     request_id = str(payload.get("id", ""))
     if not request_id or not REPLAY.check_and_remember(request_id):
-        log("RED: tekrar edilmiş istek %s" % request_id)
-        return {"ok": False, "error": "tekrar edilmiş istek"}
+        log("拒绝：重复请求 %s" % request_id)
+        return {"ok": False, "error": "重复请求"}
 
     action = str(payload.get("action", ""))
     args = payload.get("args") or {}
     actor = (payload.get("actor") or {}).get("username", "?")
 
     if action not in ACTIONS:
-        log("RED: bilinmeyen eylem %s" % action)
-        return {"ok": False, "error": "bilinmeyen eylem: %s" % action}
+        log("拒绝：未知操作 %s" % action)
+        return {"ok": False, "error": "未知操作：%s" % action}
 
     if action not in allow:
-        log("RED: izinsiz eylem %s (isteyen: %s)" % (action, actor))
-        return {"ok": False, "error": "eylem izinli değil: %s" % action}
+        log("拒绝：未授权操作 %s（请求者：%s）" % (action, actor))
+        return {"ok": False, "error": "操作未在允许列表中：%s" % action}
 
     pattern = allow[action]
     if pattern is not None:
@@ -476,20 +476,20 @@ def handle_request(message, secret, allow):
             args.get("unit") or args.get("dir") or args.get("preset") or args.get("command") or ""
         )
         if not pattern.search(subject):
-            log("RED: argüman izin desenine uymuyor (%s: %s)" % (action, subject))
-            return {"ok": False, "error": "argüman izin verilen desene uymuyor"}
+            log("拒绝：参数不符合允许的匹配规则（%s：%s）" % (action, subject))
+            return {"ok": False, "error": "参数不符合允许的匹配规则"}
 
     try:
         command = ACTIONS[action](args)
     except (ValueError, TypeError) as error:
-        return {"ok": False, "error": "geçersiz argüman: %s" % error}
+        return {"ok": False, "error": "参数无效：%s" % error}
 
     timeout = ACTION_TIMEOUTS.get(action, COMMAND_TIMEOUT_SECONDS)
     environment = None
     if action in ACTION_TIMEOUTS:
         environment = dict(os.environ, **CONSOLE_ENV)
 
-    log("ÇALIŞTIR: %s (isteyen: %s) → %s" % (action, actor, " ".join(command)))
+    log("执行：%s（请求者：%s）→ %s" % (action, actor, " ".join(command)))
     started = time.time()
 
     try:
@@ -504,9 +504,9 @@ def handle_request(message, secret, allow):
             env=environment,
         )
     except subprocess.TimeoutExpired:
-        return {"ok": False, "error": "komut %d saniyede bitmedi ve kesildi" % timeout}
+        return {"ok": False, "error": "命令在 %d 秒内未完成，已被终止" % timeout}
     except FileNotFoundError:
-        return {"ok": False, "error": "komut bulunamadı: %s" % command[0]}
+        return {"ok": False, "error": "找不到命令：%s" % command[0]}
 
     return {
         "ok": completed.returncode == 0,
@@ -533,7 +533,7 @@ class Handler(socketserver.StreamRequestHandler):
             # Bytes literali ASCII dışı karakter alamaz; metin olarak kurulup
             # kodlanıyor.
             self.wfile.write(
-                json.dumps({"ok": False, "error": "geçersiz JSON"}, ensure_ascii=False).encode(
+                json.dumps({"ok": False, "error": "JSON 格式无效"}, ensure_ascii=False).encode(
                     "utf-8"
                 )
                 + b"\n"
@@ -556,13 +556,13 @@ def main():
     syslog.openlog("panel-helper", syslog.LOG_PID, syslog.LOG_DAEMON)
 
     if os.geteuid() != 0:
-        log("HATA: root olarak çalışmalı")
+        log("错误：必须以 root 身份运行")
         return 1
 
     try:
         read_secret()
     except OSError as error:
-        log("HATA: sır dosyası okunamadı (%s): %s" % (SECRET_PATH, error))
+        log("错误：无法读取密钥文件（%s）：%s" % (SECRET_PATH, error))
         return 1
 
     # Üst dizin garanti altına alınıyor.
@@ -575,7 +575,7 @@ def main():
         try:
             os.makedirs(parent, mode=0o755, exist_ok=True)
         except OSError as error:
-            log("HATA: %s dizini oluşturulamadı: %s" % (parent, error))
+            log("错误：无法创建目录 %s：%s" % (parent, error))
             return 1
 
     # Docker tuzağı: compose, bind-mount KAYNAĞI yokken ayağa kalkarsa o yolu
@@ -590,11 +590,10 @@ def main():
     if os.path.isdir(SOCKET_PATH) and not os.path.islink(SOCKET_PATH):
         try:
             os.rmdir(SOCKET_PATH)
-            log("UYARI: %s dizin olarak duruyordu — silindi" % SOCKET_PATH)
+            log("警告：%s 原本是目录，已删除" % SOCKET_PATH)
         except OSError as error:
             log(
-                "HATA: %s bir dizin ve silinemedi (%s). İçini boşaltıp "
-                "`rmdir` ile kaldır." % (SOCKET_PATH, error)
+                "错误：%s 是目录且无法删除（%s）。请清空后使用 `rmdir` 删除。" % (SOCKET_PATH, error)
             )
             return 1
     elif os.path.lexists(SOCKET_PATH):
@@ -611,7 +610,7 @@ def main():
         os.chown(SOCKET_PATH, 0, grp.getgrnam(group).gr_gid)
     os.chmod(SOCKET_PATH, 0o660)
 
-    log("hazır: %s (izin listesi: %s)" % (SOCKET_PATH, ALLOW_PATH))
+    log("已就绪：%s（允许列表：%s）" % (SOCKET_PATH, ALLOW_PATH))
     try:
         server.serve_forever()
     except KeyboardInterrupt:

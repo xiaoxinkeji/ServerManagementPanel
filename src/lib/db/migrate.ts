@@ -44,7 +44,7 @@ function prunePreMigrationBackups(dir: string): number {
     }
   } catch (error) {
     // Budama başarısız olsa da migration akışı durmamalı.
-    console.error("[db] eski migration yedekleri budanamadı:", error);
+    console.error("[数据库] 旧迁移备份清理失败：", error);
   }
   return removed;
 }
@@ -109,7 +109,7 @@ function backupBefore(targetVersion: number): string | null {
   const removed = prunePreMigrationBackups(dir);
   if (removed > 0) {
     console.log(
-      `[db] ${removed} eski migration yedeği silindi (en yeni ${KEEP_PRE_MIGRATION_BACKUPS} tanesi saklanıyor)`, // i18n-ignore — operatör logu
+      `[数据库] 已删除 ${removed} 个旧迁移备份（保留最新 ${KEEP_PRE_MIGRATION_BACKUPS} 个）`,
     );
   }
 

@@ -213,7 +213,7 @@ export async function handleContainerCrash(
       detail: `自愈引擎已尝试重新拉起该容器 (第 ${record.count}/${maxRetries} 次尝试)。原因: ${reason === "oom" ? "OOM 内存溢出" : `异常退出 (Code: ${exitCode})`}${jevAdvice}。`,
     }).catch(console.error);
   } catch (error) {
-    console.error(`[autoheal] 无法重启容器 ${containerName}:`, error);
+    console.error(`[自动修复] 无法重启容器 ${containerName}：`, error);
   } finally {
     if (record) {
       record.restarting = false;

@@ -2,9 +2,9 @@
 
 [English](README.md) · [Türkçe](README_tr.md) · [简体中文](README_zh.md)
 
-A self-hosted management panel written for a single Linux + Docker server. It brings monitoring, alerting, Docker and compose management, quick access to services, backups, firewall, file and database management together in one interface.
+A self-hosted management panel written for a single Linux + Docker server. It brings monitoring, alerting, Docker and compose management, quick access to services, backups, firewall, file and database management together in one interface. Simplified Chinese is the default interface language, with English, Turkish, German, French, and Italian also available.
 
-Designed at home-server (homelab) scale: a single container, embedded SQLite, no external database or queue. The interface and all text are in Turkish.
+Designed at home-server (homelab) scale: a single container, embedded SQLite, no external database or queue. The default interface and operational console are in Simplified Chinese.
 
 > **Version:** 2.0.0 · **Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
 
@@ -552,6 +552,16 @@ On every push, GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci
 - **Every module that touches the outside world sits behind a provider interface** (`src/lib/providers/*.live.ts` and `*.mock.ts`). A new integration ships together with its mock implementation.
 - **Schema changes are numbered migrations** (`src/lib/db/migrations/`). An existing migration is never edited — a new one is added instead.
 - Design decisions and their rationale are kept per milestone in [`PLAN.md`](PLAN.md).
+
+---
+
+## 致谢与贡献
+
+本项目在原作者 `xiaoxinkeji` 的架构、功能设计与早期实现基础上持续演进。后续维护工作主要围绕中文运维体验、可靠性、安全边界、Docker 生命周期管理和 AI 辅助运维能力展开。
+
+感谢原作者为项目打下的基础，也感谢 Next.js、React、TypeScript、Docker、Caddy、SQLite 及相关开源项目的维护者与贡献者。所有新增改动均尽量保持原有架构约束，并通过测试、类型检查、Lint、OpenAPI 校验和生产构建进行验证。
+
+如果你基于本项目继续开发，欢迎保留原作者及上游项目的版权、许可证和贡献说明，并在提交功能改动时补充清晰的变更记录。
 
 ---
 

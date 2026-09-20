@@ -89,7 +89,7 @@ async function handle(raw: DockerEventRaw): Promise<void> {
     title: event.title,
     detail: event.detail,
   }).catch((error) => {
-    console.error("[docker-events] bildirim gönderilemedi:", error);
+      console.error("[Docker事件] 通知发送失败：", error);
   });
 }
 
@@ -111,12 +111,12 @@ function connect(): void {
     (res) => {
       if (res.statusCode !== 200) {
         res.resume();
-        console.error(`[docker-events] beklenmeyen yanıt: HTTP ${res.statusCode}`);
+        console.error(`[Docker事件] 收到异常响应：HTTP ${res.statusCode}`);
         yenidenBagla();
         return;
       }
 
-      console.log("[docker-events] Docker 事件流已建立 / Docker event stream connected");
+      console.log("[Docker事件] Docker 事件流已连接");
       gecikme = ILK_GECIKME_MS;
 
       /*
@@ -151,19 +151,19 @@ function connect(): void {
       });
 
       res.on("end", () => {
-        console.warn("[docker-events] akış kapandı");
+        console.warn("[Docker事件] 事件流已关闭");
         yenidenBagla();
       });
 
       res.on("error", (error) => {
-        console.error("[docker-events] akış hatası:", error.message);
+        console.error("[Docker事件] 事件流发生错误：", error.message);
         yenidenBagla();
       });
     },
   );
 
   req.on("error", (error) => {
-    console.error(`[docker-events] bağlanılamadı: ${error.message}`);
+    console.error(`[Docker事件] 连接失败：${error.message}`);
     yenidenBagla();
   });
 
@@ -196,7 +196,7 @@ export function startDockerEvents(): void {
   if (started) return;
   if (isMockMode()) return;
   if (!getBool("docker.events_enabled")) {
-    console.log("[docker-events] ayardan kapalı");
+    console.log("[Docker事件] 已在设置中关闭");
     return;
   }
 

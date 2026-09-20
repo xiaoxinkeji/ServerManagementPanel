@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronRight, ChevronUp, Eraser, RefreshCw, TerminalSquare } from "lucide-react";
+import { Check, ChevronRight, ChevronUp, Copy, Eraser, RefreshCw, TerminalSquare } from "lucide-react";
 import { CSRF_COOKIE, CSRF_HEADER } from "@/lib/auth/types";
 import { CONSOLE_PRESETS, UPDATE_SEQUENCE, findPreset } from "@/lib/host/presets";
 import { useDynamicT, useFormat, useT } from "@/lib/i18n/client";
@@ -80,6 +80,7 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
   const [preset, setPreset] = useState(CONSOLE_PRESETS[0].key);
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [copiedEntry, setCopiedEntry] = useState<number | null>(null);
 
   // Yukarı/aşağı ok ile geçmiş. -1 = "şu an yazdığım satır".
   const history = useRef<string[]>([]);
@@ -89,6 +90,29 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
   // Çalışan ADIMIN başlangıcı — "Güncelle" iki komut çalıştırdığı için
   // sayacın `busy`'ye değil her adıma bağlı olması gerekiyor.
   const stepStartedAt = useRef(0);
+  const historyLoaded = useRef(false);
+
+  function loadHistory() {
+    if (historyLoaded.current) return;
+    historyLoaded.current = true;
+    try {
+      const saved = window.localStorage.getItem("server-panel.console-history");
+      const parsed = saved ? JSON.parse(saved) : null;
+      if (Array.isArray(parsed)) {
+        history.current = parsed.filter((item): item is string => typeof item === "string").slice(0, 100);
+      }
+    } catch {
+      history.current = [];
+    }
+  }
+
+  function saveHistory() {
+    try {
+      window.localStorage.setItem("server-panel.console-history", JSON.stringify(history.current.slice(0, 100)));
+    } catch {
+      // Private browsing or storage limits must not block command execution.
+    }
+  }
 
   // Yeni satır geldiğinde aşağı kaydır. Kullanıcı yukarı kaydırdıysa
   // rahatsız etmemek için yalnızca dibe yakınsa.
@@ -185,10 +209,12 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
   }
 
   async function runCommand() {
+    loadHistory();
     const command = input.trim();
     if (command === "" || busy) return;
 
     history.current = [command, ...history.current.filter((item) => item !== command)].slice(0, 100);
+    saveHistory();
     historyIndex.current = -1;
     setInput("");
 
@@ -206,18 +232,21 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
    * yeniden yazdırmak, konsolun asıl faydasını (bir daha çalıştır) götürüyor.
    */
   function recallPrevious() {
+    loadHistory();
     if (history.current.length === 0) return;
     historyIndex.current = Math.min(historyIndex.current + 1, history.current.length - 1);
     setInput(history.current[historyIndex.current]);
   }
 
   function recallNext() {
+    loadHistory();
     if (historyIndex.current < 0) return;
     historyIndex.current -= 1;
     setInput(historyIndex.current < 0 ? "" : history.current[historyIndex.current]);
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    loadHistory();
     if (event.key === "Enter") {
       event.preventDefault();
       void runCommand();
@@ -237,6 +266,17 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
   }
 
   const selected = findPreset(preset);
+
+  async function copyOutput(entry: Entry) {
+    if (!entry.output) return;
+    try {
+      await navigator.clipboard.writeText(entry.output);
+      setCopiedEntry(entry.id);
+      window.setTimeout(() => setCopiedEntry(null), 1600);
+    } catch {
+      // Clipboard access is optional; the output remains selectable.
+    }
+  }
 
   return (
     <section className="rounded-lg border border-line bg-surface">
@@ -338,7 +378,18 @@ export function ConsolePanel({ maxLines }: { maxLines: number }) {
               )}
 
               {entry.output !== undefined && entry.output !== "" && (
-                <pre className="whitespace-pre-wrap break-all pl-4 text-subtle">{entry.output}</pre>
+                <div className="group relative pl-4">
+                  <pre className="whitespace-pre-wrap break-all pr-8 text-subtle">{entry.output}</pre>
+                  <button
+                    type="button"
+                    onClick={() => void copyOutput(entry)}
+                    title={copiedEntry === entry.id ? t("common.actions.copied") : t("common.actions.copy")}
+                    aria-label={copiedEntry === entry.id ? t("common.actions.copied") : t("common.actions.copy")}
+                    className="absolute right-0 top-0 rounded border border-line p-1 text-subtle opacity-60 transition-colors hover:border-brand hover:text-brand sm:opacity-0 sm:group-hover:opacity-100"
+                  >
+                    {copiedEntry === entry.id ? <Check className="size-3" /> : <Copy className="size-3" />}
+                  </button>
+                </div>
               )}
 
               {!entry.running && entry.exitCode !== undefined && (

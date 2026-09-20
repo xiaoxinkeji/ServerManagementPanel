@@ -166,7 +166,7 @@ Please diagnose this container crash and provide the exact host remediation comm
     clearTimeout(timeout);
 
     if (!res.ok) {
-      console.warn(`[LLM] API call failed with HTTP ${res.status}`);
+      console.warn(`[大模型] API 请求失败，HTTP 状态码：${res.status}`);
       return null;
     }
 
@@ -184,7 +184,7 @@ Please diagnose this container crash and provide the exact host remediation comm
       latency_ms: Date.now() - start,
     };
   } catch (err) {
-    console.error("[LLM] Deep analysis request error:", err);
+    console.error("[大模型] 深度分析请求异常：", err);
     return null;
   }
 }
