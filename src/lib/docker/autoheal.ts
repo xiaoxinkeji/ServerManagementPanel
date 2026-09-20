@@ -153,7 +153,7 @@ export async function handleContainerCrash(
         mode: jevMode as "builtin" | "remote" | "disabled",
         endpoint: getString("ai.jev.endpoint"),
         apiKey: getString("ai.jev.api_key"),
-        model: getString("ai.jev.model") || "jev-1",
+        model: getString("ai.jev.model"),
       });
 
       recordDiagnosis({

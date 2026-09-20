@@ -5,7 +5,7 @@ import { diagnoseContainerById } from "@/lib/ai/jev-server";
 export const dynamic = "force-dynamic";
 
 /**
- * 使用 Jev System One / 智能规则诊断容器状态与近期日志异常
+ * 使用本地日志规则引擎诊断容器状态与近期日志异常
  */
 export async function POST(
   request: Request,

@@ -17,7 +17,7 @@ export async function askJev(
   const mode = (getString("ai.jev.mode") || "builtin") as "builtin" | "remote" | "disabled";
   const endpoint = getString("ai.jev.endpoint");
   const apiKey = getString("ai.jev.api_key");
-  const model = getString("ai.jev.model") || "jev-1";
+  const model = getString("ai.jev.model");
 
   return askJevCore(request, {
     mode,
@@ -35,7 +35,7 @@ export async function diagnoseContainerLogs(
   const mode = (getString("ai.jev.mode") || "builtin") as "builtin" | "remote" | "disabled";
   const endpoint = getString("ai.jev.endpoint");
   const apiKey = getString("ai.jev.api_key");
-  const model = getString("ai.jev.model") || "jev-1";
+  const model = getString("ai.jev.model");
 
   return diagnoseContainerLogsCore(containerName, logs, exitCode, {
     mode,

@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       mode: jevMode,
       endpoint: getString("ai.jev.endpoint"),
       apiKey: getString("ai.jev.api_key"),
-      model: getString("ai.jev.model") || "jev-1",
+      model: getString("ai.jev.model"),
     });
 
     // 2. 第二级：LLM 深度大语言模型分析与修复处方 (System 2)

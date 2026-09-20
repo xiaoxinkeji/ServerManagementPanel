@@ -358,7 +358,7 @@ export const settingDefs: SettingDef[] = [
     min: 1,
     max: 1440,
   },
-  // ---------- Jev System One 决策模型与智能诊断 (AI Engine) ----------
+  // ---------- Jev 本地规则诊断引擎与可选远程适配 ----------
   {
     key: "ai.jev.mode",
     group: "docker",
@@ -372,7 +372,7 @@ export const settingDefs: SettingDef[] = [
     group: "docker",
     section: "jevAi",
     type: "string",
-    default: "https://api.typesafe.ai/v1/systemone",
+    default: "",
   },
   {
     key: "ai.jev.api_key",
@@ -386,7 +386,7 @@ export const settingDefs: SettingDef[] = [
     group: "docker",
     section: "jevAi",
     type: "string",
-    default: "jev-1",
+    default: "",
   },
   {
     key: "ai.jev.history_keep",

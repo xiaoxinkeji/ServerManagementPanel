@@ -8,7 +8,7 @@ import { getString } from "@/lib/settings";
 export const dynamic = "force-dynamic";
 
 /**
- * Jev System One 独立决策与智能工作台 API
+ * Jev 本地规则诊断与可选远程兼容端点工作台 API
  */
 export async function GET(request: Request) {
   const guard = await guardApi(request, "panel.view");
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
   const mode = getString("ai.jev.mode") || "builtin";
   const endpoint = getString("ai.jev.endpoint");
-  const model = getString("ai.jev.model") || "jev-1";
+  const model = getString("ai.jev.model");
 
   // 获取正在运行的容器供快速选择诊断
   const provider = getDockerProvider();
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         mode,
         endpoint: getString("ai.jev.endpoint"),
         apiKey: getString("ai.jev.api_key"),
-        model: getString("ai.jev.model") || "jev-1",
+        model: getString("ai.jev.model"),
       });
       return Response.json({ ok: true, result: res });
     }

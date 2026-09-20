@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { askJevCore, diagnoseContainerLogsCore } from "./jev.ts";
 
-describe("Jev System One Kernel", () => {
+describe("Jev local rule diagnosis engine", () => {
   it("diagnoses OOM killed crash correctly", async () => {
     const logs = `
       2026-09-19T10:00:00.000Z Starting memory stress test
@@ -58,7 +58,7 @@ describe("Jev System One Kernel", () => {
     });
     assert.equal(decision.answer, "oom_killed");
     assert.ok(decision.confidence >= 0.7);
-    assert.equal(decision.engine, "builtin_jev");
+    assert.equal(decision.engine, "local_rules");
   });
 
   it("diagnoses disk full as fatal non-autohealable", async () => {

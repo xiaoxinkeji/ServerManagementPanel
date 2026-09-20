@@ -191,13 +191,13 @@ export default function AiScreen() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
               <Sparkles className="size-3.5 animate-pulse" />
-              <span>Jev System One 极速决策中枢</span>
+               <span>Jev 本地规则诊断中枢</span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
               AI 智能运维与故障自愈工作台
             </h1>
             <p className="max-w-2xl text-sm text-subtle leading-relaxed">
-              基于 TypeSafe Jev 决策模型与毫秒级类型化推理内核，专为容器日志故障分类、不可逆错误阻断与自动化运维决策打造。
+               基于项目内置的日志签名、加权规则和类型化判定，专为容器日志分类、不可逆错误阻断与自动化运维决策打造。内置模式不下载也不运行任何模型权重。
             </p>
           </div>
 
@@ -216,11 +216,11 @@ export default function AiScreen() {
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-ok" />
                 <span className="font-semibold text-ink">
-                  {config?.mode === "builtin" ? "内置本地内核 (Built-in)" : config?.mode === "remote" ? "远程云端 API" : "禁用"}
+                   {config?.mode === "builtin" ? "本地规则引擎（无模型权重）" : config?.mode === "remote" ? "用户配置的远程兼容 API" : "禁用"}
                 </span>
               </div>
-              <span className="text-[11px] text-subtle">推理延迟: {lastLatency != null ? `~${lastLatency}ms` : "—"}</span>
-              <span className="text-[11px] text-subtle">模型: {config?.model || "jev-1"}</span>
+              <span className="text-[11px] text-subtle">规则处理耗时: {lastLatency != null ? `~${lastLatency}ms` : "—"}</span>
+               {config?.mode === "remote" && <span className="text-[11px] text-subtle">远程模型标识：{config?.model || "未配置"}</span>}
             </div>
           </div>
         </div>
@@ -307,7 +307,7 @@ export default function AiScreen() {
           </div>
           <h3 className="mt-4 font-semibold text-ink text-sm tracking-tight">零开销毫秒级决策</h3>
           <p className="mt-1 text-xs text-subtle leading-relaxed">
-            无需下载庞大模型权重，纯 CPU 概率矩阵计算，0 额外存储负担，即刻对日志故障进行精准分类。
+             不下载模型权重，使用本地日志签名与加权规则进行快速分类，零额外模型存储负担。
           </p>
         </div>
 
@@ -327,7 +327,7 @@ export default function AiScreen() {
           </div>
           <h3 className="mt-4 font-semibold text-ink text-sm tracking-tight">容器日志即时诊断</h3>
           <p className="mt-1 text-xs text-subtle leading-relaxed">
-            实时容器日志查看器内置 Jev 诊断探针，一键提取异常堆栈，输出置信度百分比与精准治理建议。
+             实时容器日志查看器内置规则诊断探针，一键提取异常堆栈，输出匹配置信度与治理建议。
           </p>
         </div>
       </div>
@@ -475,14 +475,14 @@ export default function AiScreen() {
         </div>
       </div>
 
-      {/* Jev System One 交互式决策操练台 */}
+       {/* Jev 本地规则引擎交互式测试台 */}
       <div className="rounded-3xl border border-line/60 bg-surface/80 p-7 shadow-sm backdrop-blur-xl">
         <div className="flex items-center justify-between border-b border-line/40 pb-4">
           <div className="flex items-center gap-2.5">
             <Brain className="size-5 text-brand" />
-            <h2 className="font-semibold text-ink text-base tracking-tight">Jev System One 决策操练场 (Decision Playground)</h2>
+             <h2 className="font-semibold text-ink text-base tracking-tight">Jev 规则诊断测试台 (Decision Playground)</h2>
           </div>
-          <span className="text-xs text-subtle">向 Jev 提出非结构化上下文与类型化问题</span>
+           <span className="text-xs text-subtle">用日志上下文测试本地规则与类型化判定</span>
         </div>
 
         <div className="mt-5 space-y-4">

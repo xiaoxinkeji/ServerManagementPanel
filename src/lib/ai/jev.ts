@@ -24,7 +24,7 @@ export interface JevDecisionResponse {
   confidence: number;
   reasoning?: string;
   latency_ms: number;
-  engine: "builtin_jev" | "remote_jev" | "heuristic_rules";
+  engine: "local_rules" | "remote_service" | "heuristic_rules";
   /** 获胜类别命中到的原始日志行（最多 3 条） */
   evidence?: string[];
   /** Choice 模式下各候选选项的 Softmax 概率分布 */
@@ -54,7 +54,7 @@ export interface ContainerDiagnosisResult {
   confidence: number;
   summary: string;
   recommendation: string;
-  source: "builtin_jev" | "remote_jev" | "heuristic_rules";
+  source: "local_rules" | "remote_service" | "heuristic_rules";
   latency_ms: number;
   evidence: string[];
 }
@@ -291,7 +291,10 @@ function hasErrorHit(hits: Map<JevCategory, MatchHit>, ctx: string): boolean {
 }
 
 /**
- * 内置极速 Jev 决策模型推理内核 (Builtin System One Kernel)
+ * 内置极速 Jev 规则诊断内核。
+ *
+ * 这不是机器学习模型：不加载权重、不下载文件，也不依赖推理框架。
+ * 它使用本文件中的日志签名、加权评分和概率归一化提供确定性的本地判断。
  */
 export function runBuiltinJevDecision(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
@@ -347,9 +350,9 @@ export function runBuiltinJevDecision(
     return {
       answer: bestOption,
       confidence: Number(confidence.toFixed(2)),
-      reasoning: `内置 Jev 决策内核根据日志语义特征分布匹配最佳选项: ${bestOption}`,
+      reasoning: `本地规则引擎根据日志签名和加权特征匹配最佳选项：${bestOption}`,
       latency_ms: Math.max(1, Date.now() - start),
-      engine: "builtin_jev",
+      engine: "local_rules",
       evidence: winnerHits ? pickEvidence(winnerHits.lines) : [],
       distribution,
     };
@@ -371,9 +374,9 @@ export function runBuiltinJevDecision(
     return {
       answer,
       confidence: 0.8,
-      reasoning: `内置 Jev 决策内核按匹配到的故障类别 (${matched}) 评估严重度评分: ${answer}`,
+      reasoning: `本地规则引擎按匹配到的故障类别（${matched}）评估严重度评分：${answer}`,
       latency_ms: Math.max(1, Date.now() - start),
-      engine: "builtin_jev",
+      engine: "local_rules",
       evidence: pickEvidence([...hits.values()].flatMap((h) => h.lines)),
     };
   }
@@ -385,21 +388,23 @@ export function runBuiltinJevDecision(
   return {
     answer,
     confidence: 0.88,
-    reasoning: `内置 Jev 决策内核布尔判定: ${answer ? "是" : "否"}`,
+    reasoning: `本地规则引擎布尔判定：${answer ? "是" : "否"}`,
     latency_ms: Math.max(1, Date.now() - start),
-    engine: "builtin_jev",
+    engine: "local_rules",
     evidence: pickEvidence([...hits.values()].flatMap((h) => h.lines)),
   };
 }
 
 /**
- * 远程 Jev System One 服务调用
+ * 可选远程兼容端点调用。
+ *
+ * 远程服务不是本项目的一部分，只有用户自行配置端点、密钥和模型标识时才会调用。
  */
 export async function callRemoteJev(
   request: JevDecisionChoiceRequest | JevDecisionScoreRequest | JevDecisionBooleanRequest,
   endpoint: string,
   apiKey: string,
-  model: string,
+  model?: string,
 ): Promise<JevDecisionResponse | null> {
   const startTime = Date.now();
   try {
@@ -414,7 +419,7 @@ export async function callRemoteJev(
         "User-Agent": "ServerManagementPanel-Jev/2.1",
       },
       body: JSON.stringify({
-        model,
+        ...(model?.trim() ? { model: model.trim() } : {}),
         request,
       }),
       signal: controller.signal,
@@ -431,7 +436,7 @@ export async function callRemoteJev(
       confidence: typeof data.confidence === "number" ? data.confidence : 0.85,
       reasoning: data.reasoning,
       latency_ms: Date.now() - startTime,
-      engine: "remote_jev",
+       engine: "remote_service",
       evidence: Array.isArray(data.evidence) ? data.evidence : undefined,
       distribution: data.distribution && typeof data.distribution === "object" ? data.distribution : undefined,
     };
@@ -459,7 +464,7 @@ export async function askJevCore(
   }
 
   if (mode === "remote" && config.endpoint && config.apiKey) {
-    const remoteRes = await callRemoteJev(request, config.endpoint, config.apiKey, config.model || "jev-1");
+    const remoteRes = await callRemoteJev(request, config.endpoint, config.apiKey, config.model);
     if (remoteRes) return remoteRes;
   }
 
@@ -508,7 +513,7 @@ export async function diagnoseContainerLogsCore(
     is_fatal: meta.fatal,
     can_autoheal: meta.autoheal,
     confidence: jevResult.confidence,
-    summary: jevResult.reasoning || `Jev 决策模型判断主要原因为: ${meta.label}`,
+    summary: jevResult.reasoning || `本地规则诊断引擎判断主要原因为：${meta.label}`,
     recommendation: meta.recommendation,
     source: jevResult.engine,
     latency_ms: Math.max(1, Date.now() - start),

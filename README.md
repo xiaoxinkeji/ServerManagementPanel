@@ -6,6 +6,8 @@ A self-hosted management panel written for a single Linux + Docker server. It br
 
 Designed at home-server (homelab) scale: a single container, embedded SQLite, no external database or queue. The default interface and operational console are in Simplified Chinese.
 
+> AI note: the bundled Jev implementation is a local TypeScript log-rule diagnosis engine, not an open-source language model. The repository contains and downloads no Jev model weights. Remote mode is opt-in and only forwards requests to an endpoint, key, and model identifier configured by the operator.
+
 > **Version:** 2.0.0 · **Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, Node 24 (`node:sqlite`)
 
 ---

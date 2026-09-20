@@ -441,7 +441,7 @@ export function LogViewer({
               <span>{t("docker.diagnose.title")}</span>
             </div>
             <div className="flex items-center gap-2 text-subtle text-[11px] font-mono">
-              <span>{t("docker.diagnose.source")}: {diagnosis.source.includes("jev") ? "Jev System One" : "Heuristic Rules"}</span>
+              <span>{t("docker.diagnose.source")}: {diagnosis.source === "remote_service" ? "Remote diagnosis service" : "Local log rules"}</span>
               <span>·</span>
               <span>{t("docker.diagnose.latency")}: {diagnosis.latency_ms}ms</span>
             </div>
