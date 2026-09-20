@@ -243,7 +243,7 @@ export function startScheduler(): void {
   // Zamanlayıcı process'in kapanmasını engellemesin.
   timer.unref?.();
 
-  console.log(`[jobs] zamanlayıcı başladı (${jobDefinitions.length} iş, sahip: ${OWNER})`);
+  console.log(`[jobs] 定时任务调度器已启动 / job scheduler started (${jobDefinitions.length} jobs, owner: ${OWNER})`);
 }
 
 export function jobStatuses(): JobStatusRow[] {

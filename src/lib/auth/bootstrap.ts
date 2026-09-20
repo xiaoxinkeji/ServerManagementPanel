@@ -36,13 +36,13 @@ export function bootstrapAdmin(): void {
 
   const banner = "=".repeat(64);
   console.log(`\n${banner}`);
-  console.log("  İLK YÖNETİCİ HESABI OLUŞTURULDU");
-  console.log(`  Kullanıcı : ${username}`);
+  console.log("  [ServerManagementPanel] 管理员账号已就绪 / INITIAL ADMIN ACCOUNT READY");
+  console.log(`  用户名 / Username : ${username}`);
   if (provided) {
-    console.log("  Parola    : ADMIN_PASSWORD ortam değişkeninden alındı");
+    console.log("  密码 / Password   : 来自 ADMIN_PASSWORD 环境变量 / From ADMIN_PASSWORD env");
   } else {
-    console.log(`  Parola    : ${password}`);
-    console.log("  ! Bu parola log kaydında kalır — ilk girişte değiştirilecek.");
+    console.log(`  密码 / Password   : ${password}`);
+    console.log("  ! 警告: 此密码已记录在启动日志中，请尽快在面板中更改。");
   }
   console.log(`${banner}\n`);
 }

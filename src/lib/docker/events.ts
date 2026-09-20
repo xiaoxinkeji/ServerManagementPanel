@@ -116,7 +116,7 @@ function connect(): void {
         return;
       }
 
-      console.log("[docker-events] Docker olay akışına bağlanıldı");
+      console.log("[docker-events] Docker 事件流已建立 / Docker event stream connected");
       gecikme = ILK_GECIKME_MS;
 
       /*

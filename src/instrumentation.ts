@@ -27,13 +27,13 @@ export async function register() {
 
   if (result.applied.length > 0) {
     if (result.backupPath) {
-      console.log(`[db] migration öncesi yedek: ${result.backupPath}`);
+      console.log(`[db] 数据库迁移前备份 / migration backup: ${result.backupPath}`);
     }
     console.log(
-      `[db] şema ${result.from} → ${result.to} (uygulanan: ${result.applied.join(", ")})`, // i18n-ignore — operatör logu
+      `[db] 数据库版本升级 / schema upgraded: ${result.from} → ${result.to} (applied: ${result.applied.join(", ")})`,
     );
   } else {
-    console.log(`[db] şema güncel (v${result.to})`);
+    console.log(`[db] 数据库结构最新 / schema up-to-date (v${result.to})`);
   }
 
   // T9 — env tohumlaması migration'lardan SONRA, admin'den ÖNCE:
@@ -41,7 +41,7 @@ export async function register() {
   const { seedFromEnv } = await import("@/lib/settings");
   const seeded = seedFromEnv();
   if (seeded.length > 0) {
-    console.log(`[settings] env'den tohumlandı: ${seeded.join(", ")}`);
+    console.log(`[settings] 环境变量已加载 / env seeded: ${seeded.join(", ")}`);
   }
 
   // Arayüz dili — tohumlamadan SONRA: dil env'den gelmiş olabilir.
@@ -55,7 +55,7 @@ export async function register() {
 
   const { pruneExpiredSessions } = await import("@/lib/auth/session");
   const pruned = pruneExpiredSessions();
-  if (pruned > 0) console.log(`[auth] ${pruned} süresi dolmuş oturum temizlendi`);
+  if (pruned > 0) console.log(`[auth] 清理了 ${pruned} 个过期会话 / ${pruned} expired sessions cleaned`);
 
   // T10 — yalnızca MOCK_MODE'da: uzun dönem grafikleri ve katman seçimi
   // haftalarca veri beklemeden sınanabilsin diye geçmiş üretilir.
