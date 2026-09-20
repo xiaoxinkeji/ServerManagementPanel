@@ -33,15 +33,15 @@ export function Clock({ big = false }: { big?: boolean }) {
   const now = seconds === null ? null : new Date(seconds * 1000);
 
   return (
-    <div>
+    <div className="flex flex-col justify-center">
       <div
-        className={`font-semibold tracking-tighter tabular-nums text-ink ${big ? "text-6xl" : "text-4xl"}`}
+        className={`font-semibold tracking-tighter tabular-nums text-ink ${big ? "text-6xl sm:text-7xl" : "text-4xl sm:text-5xl"}`}
         // Boşken de aynı yüksekliği kaplasın; yoksa saat gelince sayfa zıplıyor.
         style={{ minHeight: "1em" }}
       >
         {now ? f.time(now) : " "}
       </div>
-      <div className={`text-subtle font-medium tracking-wide ${big ? "mt-1.5 text-base" : "mt-0.5 text-xs"}`}>
+      <div className={`text-subtle font-medium tracking-normal ${big ? "mt-2 text-base" : "mt-1 text-xs sm:text-sm"}`}>
         {now
           ? f.date(now, { weekday: "long", day: "numeric", month: "long" })
           : " "}

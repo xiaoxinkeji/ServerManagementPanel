@@ -97,7 +97,7 @@ export default async function OverviewPage() {
    */
   const widgets: Record<string, React.ReactNode> = {
     clock: (
-      <section className="flex h-full flex-wrap items-center justify-between gap-4 rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-line hover:shadow-sm">
+      <section className="flex h-full flex-wrap items-center justify-between gap-6 rounded-3xl border border-line/60 bg-surface/80 p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
         <Clock />
         {weather.ok && <WeatherCard weather={weather.weather} label={locationLabel} />}
       </section>
@@ -107,21 +107,24 @@ export default async function OverviewPage() {
     apps: <AppSections groups={apps} />,
     maintenance: <MaintenanceSection canAct={hasPermission(session.user, "docker.action")} />,
     system: (
-      <section className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-line hover:shadow-sm">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line/40 pb-3">
-          <h2 className="text-base font-semibold tracking-tight text-ink">{t("overview.system")}</h2>
-          <span className="text-[11px] font-mono font-medium text-subtle px-2 py-0.5 rounded-full bg-canvas border border-line/50">
+      <section className="rounded-3xl border border-line/60 bg-surface/80 p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/40 pb-4">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-lg font-semibold tracking-tight text-ink">{t("overview.system")}</h2>
+            <span className="flex size-2 rounded-full bg-ok animate-pulse" />
+          </div>
+          <span className="text-[11px] font-mono font-medium text-subtle px-2.5 py-1 rounded-full bg-canvas/80 border border-line/60 shadow-2xs">
             {isMockMode()
               ? t("overview.mock")
               : t("overview.live")}
           </span>
         </div>
 
-        <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {facts.map((fact) => (
-            <div key={fact.label} className="min-w-0 rounded-xl p-3 bg-canvas/40 border border-line/30 transition-all hover:bg-canvas hover:border-line/60">
-              <dt className="text-[11px] font-medium tracking-wide text-subtle uppercase">{fact.label}</dt>
-              <dd className="truncate text-sm font-semibold tracking-tight text-ink mt-1" title={fact.value}>
+            <div key={fact.label} className="min-w-0 rounded-2xl p-4 bg-canvas/50 border border-line/40 shadow-2xs transition-all duration-200 hover:bg-canvas hover:border-line hover:shadow-xs">
+              <dt className="text-[11px] font-medium tracking-wider text-subtle uppercase">{fact.label}</dt>
+              <dd className="truncate text-sm font-semibold tracking-tight text-ink mt-1.5" title={fact.value}>
                 {fact.value}
               </dd>
             </div>

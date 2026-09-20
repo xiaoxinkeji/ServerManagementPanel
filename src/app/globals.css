@@ -4,35 +4,35 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --canvas: #f8fafc;
+  /* Apple 浅色高质感材质与语义色板 */
+  --canvas: #f5f5f7;
   --surface: #ffffff;
-  --line: #e2e8f0;
-  --ink: #0f172a;
-  --subtle: #64748b;
-  --brand: #3b82f6;
-  --ok: #16a34a;
-  --warn: #d97706;
-  --danger: #dc2626;
+  --line: rgba(0, 0, 0, 0.08);
+  --ink: #1d1d1f;
+  --subtle: #86868b;
+  --brand: #0071e3;
+  --brand-hover: #0077ed;
+  --ok: #34c759;
+  --warn: #ff9f0a;
+  --danger: #ff3b30;
+  --accent: #5856d6;
 
-  /*
-    Yapışkan üstbarın yüksekliği. Tek kaynak olarak burada duruyor çünkü iki
-    yerde birden lazım: başlığın kendi yüksekliği ve `scroll-padding-top`.
-    Çentik boşluğu da içinde — üstbar ekranın en tepesinde durduğu için
-    durum çubuğunun altına girmemesi gerekiyor.
-  */
   --header-h: calc(3.5rem + env(safe-area-inset-top));
 }
 
 .dark {
-  --canvas: #090d16;
-  --surface: #111827;
-  --line: #1e293b;
-  --ink: #f1f5f9;
-  --subtle: #94a3b8;
-  --brand: #60a5fa;
-  --ok: #34d399;
-  --warn: #fbbf24;
-  --danger: #f87171;
+  /* Apple 深空深沉暗黑材质与微光色板 (OLED Pure Black & Deep Space) */
+  --canvas: #000000;
+  --surface: #161618;
+  --line: rgba(255, 255, 255, 0.12);
+  --ink: #f5f5f7;
+  --subtle: #a1a1a6;
+  --brand: #2997ff;
+  --brand-hover: #47a6ff;
+  --ok: #30d158;
+  --warn: #ffd60a;
+  --danger: #ff453a;
+  --accent: #5e5ce6;
 }
 
 @theme inline {
@@ -42,15 +42,16 @@
   --color-ink: var(--ink);
   --color-subtle: var(--subtle);
   --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-danger: var(--danger);
+  --color-accent: var(--accent);
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "WenQuanYi Micro Hei", system-ui, ui-sans-serif, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "JetBrains Mono", SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Fira Code", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, ui-monospace, "JetBrains Mono", Menlo, Consolas,
+    monospace;
 }
 
 @layer base {

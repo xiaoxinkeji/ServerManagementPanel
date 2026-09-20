@@ -108,20 +108,22 @@ export function AppShell({ children, mode, version, user }: Props) {
       */}
       <aside
         inert={!isDesktop && !menuOpen}
-        className={`fixed bottom-0 left-0 top-0 z-40 flex w-64 max-w-[80vw] shrink-0 flex-col border-r border-line bg-surface pl-[env(safe-area-inset-left)] pt-[env(safe-area-inset-top)] transition-transform lg:sticky lg:bottom-auto lg:left-auto lg:h-dvh lg:max-w-none lg:translate-x-0 lg:self-start ${
-          menuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed bottom-0 left-0 top-0 z-40 flex w-64 max-w-[80vw] shrink-0 flex-col border-r border-line/60 bg-surface/80 backdrop-blur-2xl pl-[env(safe-area-inset-left)] pt-[env(safe-area-inset-top)] transition-transform lg:sticky lg:bottom-auto lg:left-auto lg:h-dvh lg:max-w-none lg:translate-x-0 lg:self-start ${
+          menuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-4">
-          <Server className="size-5 shrink-0 text-brand" aria-hidden />
-          <span className="truncate font-semibold tracking-tight">{t("shell.brand")}</span>
+        <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-line/40 px-4">
+          <div className="flex size-8 items-center justify-center rounded-xl bg-brand/10 text-brand shadow-xs">
+            <Server className="size-4.5 shrink-0" aria-hidden />
+          </div>
+          <span className="truncate font-semibold tracking-tight text-ink">{t("shell.brand")}</span>
           <button
             type="button"
             aria-label={t("shell.menu.close")}
             onClick={() => setMenuOpen(false)}
-            className="-mr-1 ml-auto flex shrink-0 items-center justify-center rounded p-1 text-subtle hover:text-ink lg:hidden"
+            className="-mr-1 ml-auto flex size-7 shrink-0 items-center justify-center rounded-lg p-1 text-subtle hover:bg-canvas hover:text-ink active:scale-95 lg:hidden"
           >
-            <X className="size-5" />
+            <X className="size-4" />
           </button>
         </div>
 
@@ -328,18 +330,18 @@ function NavLink({
       href={item.href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={`group flex items-center gap-2.5 rounded-lg px-2.5 transition-all duration-150 ${
-        compact ? "py-1 text-[13px]" : "py-1.5 text-sm"
+      className={`group flex items-center gap-2.5 rounded-xl px-2.5 transition-all duration-200 ${
+        compact ? "py-1 text-[13px]" : "py-2 text-sm"
       } ${
         active
-          ? "bg-brand/12 font-medium text-brand shadow-xs"
-          : "text-subtle hover:bg-line/40 hover:text-ink hover:translate-x-0.5"
+          ? "bg-brand text-white font-medium shadow-sm shadow-brand/20 active:scale-[0.98]"
+          : "text-subtle hover:bg-canvas/80 hover:text-ink active:scale-[0.98]"
       }`}
     >
-      <Icon className={`shrink-0 transition-colors ${compact ? "size-3.5" : "size-4"} ${active ? "text-brand" : "text-subtle group-hover:text-ink"}`} aria-hidden />
+      <Icon className={`shrink-0 transition-colors ${compact ? "size-3.5" : "size-4"} ${active ? "text-white" : "text-subtle group-hover:text-ink"}`} aria-hidden />
       <span className="truncate">{tk(item.labelKey)}</span>
       {item.milestone && (
-        <span className="ml-auto rounded border border-line px-1 py-px font-mono text-[10px] text-subtle">
+        <span className={`ml-auto rounded-md px-1.5 py-0.5 font-mono text-[10px] ${active ? "bg-white/20 text-white" : "border border-line/60 text-subtle"}`}>
           {item.milestone}
         </span>
       )}

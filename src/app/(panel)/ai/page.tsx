@@ -301,31 +301,31 @@ export default function AiScreen() {
 
       {/* 核心特性与架构能力展示 */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-line/60 bg-surface/70 p-5 shadow-xs backdrop-blur-md transition-all hover:border-line hover:shadow-sm">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
-            <Cpu className="size-5" />
+        <div className="rounded-3xl border border-line/60 bg-surface/80 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-brand/10 text-brand shadow-2xs">
+            <Cpu className="size-5.5" />
           </div>
-          <h3 className="mt-3 font-semibold text-ink text-sm">零开销毫秒级决策</h3>
+          <h3 className="mt-4 font-semibold text-ink text-sm tracking-tight">零开销毫秒级决策</h3>
           <p className="mt-1 text-xs text-subtle leading-relaxed">
             无需下载庞大模型权重，纯 CPU 概率矩阵计算，0 额外存储负担，即刻对日志故障进行精准分类。
           </p>
         </div>
 
-        <div className="rounded-2xl border border-line/60 bg-surface/70 p-5 shadow-xs backdrop-blur-md transition-all hover:border-line hover:shadow-sm">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-warn/10 text-warn">
-            <ShieldCheck className="size-5" />
+        <div className="rounded-3xl border border-line/60 bg-surface/80 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-warn/10 text-warn shadow-2xs">
+            <ShieldCheck className="size-5.5" />
           </div>
-          <h3 className="mt-3 font-semibold text-ink text-sm">故障自愈智能熔断</h3>
+          <h3 className="mt-4 font-semibold text-ink text-sm tracking-tight">故障自愈智能熔断</h3>
           <p className="mt-1 text-xs text-subtle leading-relaxed">
             与面板 Docker 自愈引擎深度联动。遇到不可恢复的硬性配置或权限故障时，提前智能阻断重启死循环。
           </p>
         </div>
 
-        <div className="rounded-2xl border border-line/60 bg-surface/70 p-5 shadow-xs backdrop-blur-md transition-all hover:border-line hover:shadow-sm">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-ok/10 text-ok">
-            <Terminal className="size-5" />
+        <div className="rounded-3xl border border-line/60 bg-surface/80 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-line hover:shadow-md">
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-ok/10 text-ok shadow-2xs">
+            <Terminal className="size-5.5" />
           </div>
-          <h3 className="mt-3 font-semibold text-ink text-sm">容器日志即时诊断</h3>
+          <h3 className="mt-4 font-semibold text-ink text-sm tracking-tight">容器日志即时诊断</h3>
           <p className="mt-1 text-xs text-subtle leading-relaxed">
             实时容器日志查看器内置 Jev 诊断探针，一键提取异常堆栈，输出置信度百分比与精准治理建议。
           </p>
@@ -333,21 +333,21 @@ export default function AiScreen() {
       </div>
 
       {/* 一键容器 Jev 诊断 */}
-      <div className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md">
+      <div className="rounded-3xl border border-line/60 bg-surface/80 p-7 shadow-sm backdrop-blur-xl">
         <div className="flex items-center justify-between border-b border-line/40 pb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Activity className="size-5 text-brand" />
-            <h2 className="font-semibold text-ink text-base">容器一键诊断 (Container Quick Diagnose)</h2>
+            <h2 className="font-semibold text-ink text-base tracking-tight">容器一键诊断 (Container Quick Diagnose)</h2>
           </div>
           <span className="text-xs text-subtle">读取容器近期 100 行日志并输出故障分类报告</span>
         </div>
 
         <div className="mt-5 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <select
               value={selectedContainer}
               onChange={(e) => setSelectedContainer(e.target.value)}
-              className="min-w-56 rounded-xl border border-line bg-canvas/60 p-2.5 text-xs text-ink focus:border-brand focus:outline-none"
+              className="min-w-56 rounded-2xl border border-line bg-canvas/60 p-3 text-xs text-ink focus:border-brand focus:outline-none"
             >
               <option value="">选择目标容器...</option>
               {containers.map((c) => (
@@ -360,7 +360,7 @@ export default function AiScreen() {
               type="button"
               disabled={diagnosing || !selectedContainer}
               onClick={handleDiagnose}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand/90 active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand px-5 py-3 text-xs font-semibold text-white shadow-sm transition-all hover:bg-brand/90 active:scale-95 disabled:opacity-50"
             >
               <Sparkles className="size-3.5" />
               <span>{diagnosing ? "Jev 诊断中..." : "一键 Jev 诊断"}</span>
@@ -476,11 +476,11 @@ export default function AiScreen() {
       </div>
 
       {/* Jev System One 交互式决策操练台 */}
-      <div className="rounded-2xl border border-line/60 bg-surface/70 p-6 shadow-xs backdrop-blur-md">
+      <div className="rounded-3xl border border-line/60 bg-surface/80 p-7 shadow-sm backdrop-blur-xl">
         <div className="flex items-center justify-between border-b border-line/40 pb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Brain className="size-5 text-brand" />
-            <h2 className="font-semibold text-ink text-base">Jev System One 决策操练场 (Decision Playground)</h2>
+            <h2 className="font-semibold text-ink text-base tracking-tight">Jev System One 决策操练场 (Decision Playground)</h2>
           </div>
           <span className="text-xs text-subtle">向 Jev 提出非结构化上下文与类型化问题</span>
         </div>
